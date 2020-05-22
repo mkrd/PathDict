@@ -25,7 +25,7 @@ PathDict is like a normal python dict, but comes with some handy extras.
 pd = PathDict({})
 ```
 
-A PathDict keeps a reference to the original initializing dict
+A PathDict keeps a reference to the original initializing dict:
 
 ```python
 user = {
@@ -38,17 +38,20 @@ user = {
 	}
 }
 joe = PathDict(user)
-> joe == user # True
-> joe.dict is user # True
+> joe == user
+---> True
+> joe.dict is user
+---> True
 ```
 
 You can also get a deep copy:
 
-
 ```python
 joe = PathDict(user, deep_copy=True)
-> joe == user # True
-> joe.dict is user # False
+> joe == user
+---> True
+> joe.dict is user
+---> False
 ```
 
 
@@ -60,16 +63,15 @@ You can use paths of keys to access values:
 ```python
 joe = PathDict(user, deep_copy=True)
 
-# Get
-
+# Get existing path
 > joe["friends", "Sue", "age"]
 ---> 30
 
+# Get non-existent, but valid path
 > joe["friends", "Josef", "age"]
 ---> None
 
-# Set
-
+# Set non-existent, but valid path, creates keys
 joe["authentification", "password"] = "abc123"
 > joe["authentification"]
 ---> PathDict({"password": "abc123"})
@@ -81,10 +83,9 @@ Using invalid paths to get or set a value will result in an error. An invalid pa
 ```python
 joe = PathDict(user, deep_copy=True)
 
-
+# Get invalid path (joe["hobbies"] is a list)
 > joe["hobbies", "not_existent"]
 ---> Error!
-
 ```
 
 
