@@ -112,6 +112,7 @@ for value in pathdict.values():
 ```
 
 
+### Apply a function at a path
 
 ### Filtering
 
