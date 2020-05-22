@@ -22,7 +22,11 @@ PathDict is like a normal python dict, but comes with some handy extras.
 
 ```python
 # Empty PathDict
-pd = PathDict({})
+pd = PathDict()
+
+> pd
+---> PathDict({})
+
 ```
 
 A PathDict keeps a reference to the original initializing dict:

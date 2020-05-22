@@ -11,7 +11,7 @@ class PathDict(UserDict):
 		working with paths.
 	"""
 
-	def __init__(self, data: dict, deep_copy: bool = False):
+	def __init__(self, data: dict = {}, deep_copy: bool = False):
 		"""
 			Initialize with a dict or another PathDict.
 			This will reference the original dict or PathDict,
