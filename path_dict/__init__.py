@@ -11,12 +11,12 @@ class PathDict(UserDict):
 		working with paths.
 	"""
 
-	def __init__(self, data: Union[PathDict, Dict] = {}, deep_copy: bool = False):
+	def __init__(self, data: Union[PathDict, Dict] = {}, deepcopy: bool = False):
 		"""
 			Initialize with a dict or another PathDict.
 			This will reference the original dict or PathDict,
 			so changes will also happen to them.
-			If you do not want this set deep_copy to True.
+			If you do not want this set deepcopy to True.
 		"""
 		if isinstance(data, PathDict):
 			self.data = data.data
@@ -24,7 +24,7 @@ class PathDict(UserDict):
 			self.data = data
 		else:
 			raise Exception("PathDict init: data must be a dict")
-		if deep_copy:
+		if deepcopy:
 			self.data = copy.deepcopy(self.data)
 
 
@@ -45,7 +45,7 @@ class PathDict(UserDict):
 		"""
 			Create a complete copy of a PathDict
 		"""
-		return PathDict(self, deep_copy=True)
+		return PathDict(self, deepcopy=True)
 
 
 	def __repr__(self) -> str:

@@ -51,7 +51,7 @@ joe = PathDict(user)
 You can also get a deep copy:
 
 ```python
-joe = PathDict(user, deep_copy=True)
+joe = PathDict(user, deepcopy=True)
 > joe == user
 ---> True
 > joe.dict is user
@@ -65,7 +65,7 @@ joe = PathDict(user, deep_copy=True)
 You can use paths of keys to access values:
 
 ```python
-joe = PathDict(user, deep_copy=True)
+joe = PathDict(user, deepcopy=True)
 
 # Get existing path
 > joe["friends", "Sue", "age"]
@@ -85,7 +85,7 @@ Using invalid paths to get or set a value will result in an error. An invalid pa
 
 
 ```python
-joe = PathDict(user, deep_copy=True)
+joe = PathDict(user, deepcopy=True)
 
 # Get invalid path (joe["hobbies"] is a list)
 > joe["hobbies", "not_existent"]
@@ -152,7 +152,7 @@ A filtered function is also offered, which does the same, but returns a filtered
 
 
 ```python
-joe = PathDict(user, deep_copy=True)
+joe = PathDict(user, deepcopy=True)
 
 # Remove all friends that are older than 33.
 joe.filter("friends", f=lambda k, v: v["age"] < 33)
@@ -170,7 +170,7 @@ The aggregate function can combine a PathDict to a single aggregated value.
 It takes an init parameter, and a function with takes three arguments (eg. `lambda key, val, agg`)
 
 ```python
-joe = PathDict(user, deep_copy=True)
+joe = PathDict(user, deepcopy=True)
 
 # Remove all friends that are older than 33.
 friend_ages = joe.aggregate("friends", init=0, f=lambda k, v, a: a + v["age"])
