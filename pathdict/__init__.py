@@ -1,6 +1,6 @@
 from __future__ import annotations
 from collections import UserDict
-from typing import Union, Any
+from typing import Union, Any, Dict
 import json
 import copy
 
@@ -11,7 +11,7 @@ class PathDict(UserDict):
 		working with paths.
 	"""
 
-	def __init__(self, data: dict = {}, deep_copy: bool = False):
+	def __init__(self, data: Union[PathDict, Dict] = {}, deep_copy: bool = False):
 		"""
 			Initialize with a dict or another PathDict.
 			This will reference the original dict or PathDict,
@@ -27,8 +27,14 @@ class PathDict(UserDict):
 		if deep_copy:
 			self.data = copy.deepcopy(self.data)
 
+
+
+	def __contains__(self, key):
+		# Add contains from collections to silence pylint
+		return key in self.data
+
 	@property
-	def dict(self) -> dict:
+	def dict(self) -> Dict:
 		"""
 			Returns a reference to the internal dict.
 		"""
@@ -111,7 +117,7 @@ class PathDict(UserDict):
 		self.set_path(path, value=function(value))
 
 
-	def __getitem__(self, path) -> Any:
+	def __getitem__(self, path) -> Union[PathDict, Any]:
 		""" Subscript for <PathDict>.get_path() """
 		# If PathDict["key1"], then path="key1"
 		# PathDict["key1", "key2"], then path=tuple("key1", "key2")
