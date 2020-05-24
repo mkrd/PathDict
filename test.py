@@ -156,6 +156,12 @@ def test_filter():
 
 
 @test()
+def test_aggregate():
+	users_pd = PathDict(users, deep_copy=True)
+	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
+	assert users_ages == 103
+
+@test()
 def test_PathDict():
 	d = {
 		"total_users": 3,
