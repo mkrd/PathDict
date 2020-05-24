@@ -1,4 +1,5 @@
 from pathdict import PathDict
+from typing import Callable
 import copy
 import time
 import traceback
@@ -15,7 +16,7 @@ def colored_str_by_color_code(s, color_code):
 
 class test:
 	""" A decorator that runs tests automatically and provides teardown and setup """
-	def __init__(self, setup: callable = lambda: None, teardown: callable = lambda: None):
+	def __init__(self, setup: Callable = lambda: None, teardown: Callable = lambda: None):
 		self.setup = setup
 		self.teardown = teardown
 
@@ -180,7 +181,7 @@ def test_PathDict():
 	o = PathDict(d)
 	# Getting attributes
 	assert o["total_users"] == 3
-	assert o["not_exists"] == None
+	assert o["not_exists"] is None
 	assert o["users"] == {
 		"1": {"name": "Joe", "age": 22},
 		"2": {"name": "Ben", "age": 49},
