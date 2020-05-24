@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "PathDict"
+version = "1.0.0"
+description = "The versatile dict for Python!"
+authors = ["Marcel Kröker <kroeker.marcel@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+classifiers=[
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+	"Intended Audience :: Developers",
+	"Programming Language :: Python",
+	"Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.5.2"
+flake8 = "^3.8.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
