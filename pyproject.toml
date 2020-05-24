@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "path_dict"
-version = "1.0.1"
+version = "1.0.2"
 description = "The versatile dict for Python!"
 authors = ["Marcel Kröker <kroeker.marcel@gmail.com>"]
 license = "MIT"
