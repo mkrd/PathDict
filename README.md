@@ -3,12 +3,12 @@ The versatile dict for Python!
 
 
 ## Installation
-`pip3 install pathdict`
+`pip3 install path-dict`
 
 Import:
 
 ```python
-from pathdict import PathDict
+from path_dict import PathDict
 ```
 
 

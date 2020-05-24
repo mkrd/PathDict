@@ -1,4 +1,4 @@
-from pathdict import PathDict
+from path_dict import PathDict
 from typing import Callable
 import copy
 import time
