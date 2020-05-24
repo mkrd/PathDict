@@ -118,8 +118,68 @@ for value in pathdict.values():
 
 ### Apply a function at a path
 
+When setting a value, you can use a lambda function to modify the value at a given path.
+The function should take one argument and return the modified value.
+
+
+```python
+stats_dict = {}
+stats_pd = PathDict({})
+
+# Using a standard dict:
+if "views" not in stats_dict:
+	stats_dict["views"] = {}
+if "total" not in stats_dict["views"]:
+	 stats_dict["views"]["total"] = 0
+stats_dict["views"]["total"] += 1
+
+# You can achieve the same using a PathDict:
+stats_pd["views", "total"] = lambda x: (x or 0) + 1
+```
+
+
+
 ### Filtering
+
+PathDicts offer a filter function, which can filter a list or a PathDict at a given path in-place.
+
+To filter a list, pass a function that takes one argument (eg. `lambda ele: return ele > 10`) and returns True if the value should be kept, else False.
+To filter a PathDict, pass a function that takes two arguments (eg. `lambda key, value: key != "1"`) and returns True if the key-value pair should be kept, else False.
+
+You can filter the PathDict filter is called on, or you can also pass a path into the filter to apply the filter at a given path.
+
+A filtered function is also offered, which does the same, but returns a filtered deepcopy instead of filtering in-place.
+
+
+```python
+joe = PathDict(user, deep_copy=True)
+
+# Remove all friends that are older than 33.
+joe.filter("friends", f=lambda k, v: v["age"] < 33)
+
+> joe["friends"]
+---> PathDict({
+	"Sue": {"age": 30}
+})
+```
+
 
 ### Aggregating
 
+The aggregate function can combine a PathDict to a single aggregated value.
+It takes an init parameter, and a function with takes three arguments (eg. `lambda key, val, agg`)
+
+```python
+joe = PathDict(user, deep_copy=True)
+
+# Remove all friends that are older than 33.
+friend_ages = joe.aggregate("friends", init=0, f=lambda k, v, a: a + v["age"])
+
+> friend_ages
+---> 65
+```
+
 ### Serialize to JSON
+
+To serialize a PathDict to JSON, call `json.dumps(path_dict.dict)`.
+If you try to serialize a PathDict object itself, the operation will fail.
