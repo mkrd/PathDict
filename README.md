@@ -1,4 +1,7 @@
 # PathDict
+
+[![Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
+
 The versatile dict for Python!
 
 
