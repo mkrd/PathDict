@@ -93,7 +93,7 @@ def initialization():
 	assert isinstance(pd["premium_users"], list)
 	assert pd["premium_users"] is init_dict["premium_users"]
 	# Deep copy behavior
-	dc_pd = PathDict(users, deepcopy=True)
+	dc_pd = PathDict(users, deep_copy=True)
 	assert dc_pd.dict is not users
 	dc_pd_deepcopy = dc_pd.deepcopy
 	assert dc_pd is not dc_pd_deepcopy
@@ -122,7 +122,7 @@ def test_get_path():
 
 @test()
 def test_filter():
-	users_pd = PathDict(users, deepcopy=True)
+	users_pd = PathDict(users, deep_copy=True)
 
 	users_filtered = users_pd.filtered("users", f=lambda k, v: v["age"] <= 30)
 	assert users_filtered["users"] == {
@@ -158,7 +158,7 @@ def test_filter():
 
 @test()
 def test_aggregate():
-	users_pd = PathDict(users, deepcopy=True)
+	users_pd = PathDict(users, deep_copy=True)
 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
 	assert users_ages == 103
 
