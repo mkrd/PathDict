@@ -1,6 +1,6 @@
 from __future__ import annotations
 from collections import UserDict
-from typing import Union, Any, Dict, Callable
+from typing import Union, Any
 import json
 import copy
 
@@ -11,12 +11,21 @@ class PathDict(UserDict):
 		working with paths.
 	"""
 
-	def __init__(self, data: Union[PathDict, Dict] = {}, deepcopy: bool = False):
+	# FIX wrong behavior of standard library
+	# <a>.pop(<b>, None) returns key error, if <b> not in <a>.
+	# This fixes it.
+	def pop(self, key, *args):
+		return self.data.pop(key, *args)
+
+
+
+
+	def __init__(self, data: dict = {}, deep_copy: bool = False):
 		"""
 			Initialize with a dict or another PathDict.
 			This will reference the original dict or PathDict,
 			so changes will also happen to them.
-			If you do not want this set deepcopy to True.
+			If you do not want this set deep_copy to True.
 		"""
 		if isinstance(data, PathDict):
 			self.data = data.data
@@ -24,17 +33,11 @@ class PathDict(UserDict):
 			self.data = data
 		else:
 			raise Exception("PathDict init: data must be a dict")
-		if deepcopy:
+		if deep_copy:
 			self.data = copy.deepcopy(self.data)
 
-
-
-	def __contains__(self, key):
-		# Add contains from collections to silence pylint
-		return key in self.data
-
 	@property
-	def dict(self) -> Dict:
+	def dict(self) -> dict:
 		"""
 			Returns a reference to the internal dict.
 		"""
@@ -45,7 +48,7 @@ class PathDict(UserDict):
 		"""
 			Create a complete copy of a PathDict
 		"""
-		return PathDict(self, deepcopy=True)
+		return PathDict(self, deep_copy=True)
 
 
 	def __repr__(self) -> str:
@@ -108,7 +111,7 @@ class PathDict(UserDict):
 			current[last_path_attr] = value
 
 
-	def apply_at_path(self, path: list, function: Callable):
+	def apply_at_path(self, path: list, function: callable):
 		"""
 			At a given path, apply the given function
 			to the value at that path.
@@ -117,7 +120,7 @@ class PathDict(UserDict):
 		self.set_path(path, value=function(value))
 
 
-	def __getitem__(self, path) -> Union[PathDict, Any]:
+	def __getitem__(self, path) -> Any:
 		""" Subscript for <PathDict>.get_path() """
 		# If PathDict["key1"], then path="key1"
 		# PathDict["key1", "key2"], then path=tuple("key1", "key2")
@@ -135,7 +138,7 @@ class PathDict(UserDict):
 			self.set_path(path, value=value)
 
 
-	def filter(self, *path, f: Callable = None):
+	def filter(self, *path, f: callable = None):
 		"""
 			Only keep the mapping or list elements at path
 			that satisfy f.
@@ -153,7 +156,7 @@ class PathDict(UserDict):
 			self[path] = [x for x in list(path_val) if f(x)]
 
 
-	def filtered(self, *path, f: Callable = None):
+	def filtered(self, *path, f: callable = None):
 		"""
 			Like filter, but does not modify this object,
 			but returns a filtered deepcopy.
@@ -163,7 +166,7 @@ class PathDict(UserDict):
 		return deepcopy
 
 
-	def aggregate(self, *path, init=None, f: Callable = None):
+	def aggregate(self, *path, init=None, f: callable = None):
 		"""
 			Aggregate a value starting with init at the given path.
 			f takes 3 arguments: key, values, and agg (initialized with init).
