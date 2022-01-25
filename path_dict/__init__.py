@@ -36,7 +36,7 @@ class PathDict(UserDict):
 			raise Exception("PathDict init: data must be a dict")
 		# Prevent referencing the default value of the data argument
 		if self.data == {}:
-			self.data = Dict()
+			self.data = dict()
 		# If deep_copy is True, make a deep copy of the data
 		if deep_copy:
 			self.data = copy.deepcopy(self.data)
