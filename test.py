@@ -63,6 +63,32 @@ users = {
 	]
 }
 
+@test()
+def referencing():
+	p_table = {
+		"p1": PathDict(),
+		"p2": PathDict(),
+		"p3": PathDict({}),
+		"p4": PathDict({}),
+	}
+	for a in p_table:
+		for b in p_table:
+			if a == b:
+				continue
+			assert p_table[a].data is not p_table[b].data
+
+	shared_d1 = {}
+	p1_with_shared_d1 = PathDict(shared_d1)
+	p2_with_shared_d1 = PathDict(shared_d1)
+	assert p1_with_shared_d1.data is p2_with_shared_d1.data
+
+	p_with_deep_copy_d1 = PathDict(shared_d1, deep_copy=True)
+	p3_with_shared_d1 = PathDict(shared_d1)
+
+	# Deep copy should have its own value
+	assert p_with_deep_copy_d1.data is not p1_with_shared_d1.data
+	# Ensure deep_copy is set to False again
+	assert p3_with_shared_d1.data is p1_with_shared_d1.data
 
 
 @test()
