@@ -1,4 +1,5 @@
 from __future__ import annotations
+from ast import Dict
 from collections import UserDict
 from typing import Union, Any
 import json
@@ -20,7 +21,7 @@ class PathDict(UserDict):
 
 
 
-	def __init__(self, data: dict = {}, deep_copy: bool = False):
+	def __init__(self, data: dict | PathDict = {}, deep_copy: bool = False):
 		"""
 			Initialize with a dict or another PathDict.
 			This will reference the original dict or PathDict,
@@ -33,6 +34,10 @@ class PathDict(UserDict):
 			self.data = data
 		else:
 			raise Exception("PathDict init: data must be a dict")
+		# Prevent referencing the default value of the data argument
+		if self.data == {}:
+			self.data = Dict()
+		# If deep_copy is True, make a deep copy of the data
 		if deep_copy:
 			self.data = copy.deepcopy(self.data)
 
