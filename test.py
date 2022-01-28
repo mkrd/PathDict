@@ -268,3 +268,58 @@ def test_PathDict():
 			["Ben", "Joe"],
 			["Joe", "Ben"]]
 	}
+
+
+
+
+
+@test()
+def test_star_operations():
+	winners_original = PathDict({
+		"2017": {
+			"podium": {
+				"17-place-1": {"name": "Joe", "age": 22},
+				"17-place-2": {"name": "Ben", "age": 13},
+				"17-place-3": {"name": "Sue", "age": 98},
+			},
+			"prices_list": ["Car", "Bike", "Plane"],
+		},
+		"2018": {
+			"podium": {
+				"18-place-1": {"name": "Bernd", "age": 50},
+				"18-place-2": {"name": "Sara", "age": 32},
+				"18-place-3": {"name": "Jan", "age": 26},
+			},
+			"prices_list": ["Beer", "Coffee", "Cigarette"],
+		},
+	})
+
+	# assert winners == winners["*"]
+
+
+	# Increment age of all users by 1
+	winners = winners_original.deepcopy
+	winners["*", "podium", "*", "age"] = lambda x: x + 1
+	assert winners["2017", "podium", "17-place-1", "age"] == 23
+	assert winners["2017", "podium", "17-place-2", "age"] == 14
+	assert winners["2017", "podium", "17-place-3", "age"] == 99
+	assert winners["2018", "podium", "18-place-1", "age"] == 51
+	assert winners["2018", "podium", "18-place-2", "age"] == 33
+	assert winners["2018", "podium", "18-place-3", "age"] == 27
+
+	# winners = winners_original.deepcopy
+	# winners["*", "podium", "*"] = lambda x: x["age"] += 1 if "B" in x["name"] else x["age"] == 0
+
+
+
+
+	# print("GO")
+	# assert AssertionError()
+	# print(winners)
+
+
+	# names_2017 = winners["2017", "podium", "*", "name"]
+	# print(names_2017)
+	# assert names_2017 == ["Joe", "Ben", "Sue"]
+
+

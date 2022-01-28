@@ -129,13 +129,34 @@ class PathDict(UserDict):
 
 
 
-	def apply_at_path(self, path: list, function: callable):
+	def _expand_star_path(self, path: list) -> list:
+		"""
+			Expand the given path containing "*" to a list of paths where all "*" have been expanded by all keys.
+		"""
+		paths = [[]]
+		for key in path:
+			if key != "*":
+				# Extend all paths by the key if it is not "*"
+				paths = [path + [key] for path in paths]
+			else:
+				# Now key is "*", expand all paths by all keys at the respective path
+				paths = [p + [k] for p in paths for k in self.get_path(p).keys()]
+
+		# Return empty list if no paths were found
+		paths = paths if paths != [[]] else []
+		return paths
+
+
+
+	def apply_at_path(self, path: list, function: Callable):
 		"""
 			At a given path, apply the given function
 			to the value at that path.
 		"""
-		value = self.get_path(path)
-		self.set_path(path, value=function(value))
+		for expanded_path in self._expand_star_path(path):
+			applied = function(self.get_path(expanded_path))
+			self.set_path(expanded_path, value=applied)
+
 
 
 	def __getitem__(self, path) -> Any | PathDict:
@@ -174,6 +195,7 @@ class PathDict(UserDict):
 			self[path] = filtered
 		elif isinstance(path_val, list):
 			self[path] = [x for x in list(path_val) if f(x)]
+
 
 
 	def filtered(self, *path, f: Callable = None):
