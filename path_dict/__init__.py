@@ -60,7 +60,7 @@ class PathDict(UserDict):
 		"""
 			Returns a pretty indented string representation.
 		"""
-		dump = json.dumps(self.data, indent=2, sort_keys=True)
+		dump = json.dumps(self.data, indent=4, sort_keys=True, default=str)
 		return f"PathDict({dump})"
 
 
