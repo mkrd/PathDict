@@ -64,6 +64,28 @@ users = {
 }
 
 @test()
+def test_deepcopy():
+	# Test deepcopy with object
+	class TestObject():
+		def __init__(self, data):
+			self.data = data
+
+		def __repr__(self):
+			return f"TestObject({self.data})"
+
+	pd = PathDict({})
+	pd["test", "test"] = TestObject({"test": "test"})
+
+	assert str(pd) == """PathDict({\n    "test": {\n        "test": "TestObject({'test': 'test'})"\n    }\n})"""
+
+	try:
+		pd_deepcopy = pd.deepcopy
+		assert str(pd) == str(pd_deepcopy)
+	except Exception:
+		raise AssertionError("pd.deepcopy failed")
+
+
+@test()
 def referencing():
 	p_table = {
 		"p1": PathDict(),
