@@ -1,9 +1,9 @@
 from __future__ import annotations
-from ast import Dict
 from collections import UserDict
-from typing import Any
+from typing import Any, Callable
 import json
 import copy
+
 
 
 class PathDict(UserDict):
@@ -147,7 +147,8 @@ class PathDict(UserDict):
 		return self.get_path(path)
 
 
-	def __setitem__(self, path, value):
+
+	def __setitem__(self, path, value: Callable | Any):
 		""" Subscript for <PathDict>.get_path() and <PathDict>.apply_at_path() """
 		path = list(path) if isinstance(path, tuple) else [path]
 		if callable(value):
@@ -156,7 +157,8 @@ class PathDict(UserDict):
 			self.set_path(path, value=value)
 
 
-	def filter(self, *path, f: callable = None):
+
+	def filter(self, *path, f: Callable = None):
 		"""
 			Only keep the mapping or list elements at path
 			that satisfy f.
@@ -174,7 +176,7 @@ class PathDict(UserDict):
 			self[path] = [x for x in list(path_val) if f(x)]
 
 
-	def filtered(self, *path, f: callable = None):
+	def filtered(self, *path, f: Callable = None):
 		"""
 			Like filter, but does not modify this object,
 			but returns a filtered deepcopy.
@@ -184,7 +186,8 @@ class PathDict(UserDict):
 		return deepcopy
 
 
-	def aggregate(self, *path, init=None, f: callable = None):
+
+	def aggregate(self, *path, init=None, f: Callable = None):
 		"""
 			Aggregate a value starting with init at the given path.
 			f takes 3 arguments: key, values, and agg (initialized with init).
