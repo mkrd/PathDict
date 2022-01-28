@@ -1,7 +1,7 @@
 from __future__ import annotations
 from ast import Dict
 from collections import UserDict
-from typing import Union, Any
+from typing import Any
 import json
 import copy
 
@@ -12,12 +12,13 @@ class PathDict(UserDict):
 		working with paths.
 	"""
 
+
+
 	# FIX wrong behavior of standard library
 	# <a>.pop(<b>, None) returns key error, if <b> not in <a>.
 	# This fixes it.
 	def pop(self, key, *args):
 		return self.data.pop(key, *args)
-
 
 
 
@@ -33,13 +34,17 @@ class PathDict(UserDict):
 		elif isinstance(data, dict):
 			self.data = data
 		else:
-			raise Exception("PathDict init: data must be a dict")
+			raise TypeError("PathDict init: data argument must be a dict or PathDict")
+
 		# Prevent referencing the default value of the data argument
 		if data is self.__init__.__defaults__[0]:
 			self.data = {}
+
 		# If deep_copy is True, make a deep copy of the data
 		if deep_copy:
 			self.data = copy.deepcopy(self.data)
+
+
 
 	@property
 	def dict(self) -> dict:
@@ -48,12 +53,15 @@ class PathDict(UserDict):
 		"""
 		return self.data
 
+
+
 	@property
 	def deepcopy(self) -> PathDict:
 		"""
 			Create a complete copy of a PathDict
 		"""
 		return PathDict(self, deep_copy=True)
+
 
 
 	def __repr__(self) -> str:
@@ -64,7 +72,8 @@ class PathDict(UserDict):
 		return f"PathDict({dump})"
 
 
-	def get_path(self, path: list) -> Union[PathDict, Any]:
+
+	def get_path(self, path: list) -> PathDict | Any:
 		"""
 			Get the value of the json object at the given path
 			<PathDict>.get_path(["1", "2", "3"]) is like calling
@@ -75,16 +84,19 @@ class PathDict(UserDict):
 			return None
 		if path == []:
 			return self
+
+		# Iterate over the path to safely get the value
 		current = self.data
-		for attr in path:
+		for key in path:
 			if not isinstance(current, dict):
-				raise Exception(f"Your path is not a path of dicts (value at key {attr} is of type {type(current)})")
-			if attr not in current:
+				raise Exception(f"The path {path} is not a stack of nested dicts (value at key {key} has type {type(current)})")
+			if key not in current:
 				return None
-			current = current[attr]
+			current = current[key]
 		if isinstance(current, dict):
 			return PathDict(current)
 		return current
+
 
 
 	def set_path(self, path: list, value=None):
@@ -104,16 +116,17 @@ class PathDict(UserDict):
 				self.data = value
 			return
 		current = self.data
-		last_path_attr = path.pop()
-		for attr in path:
+		last_path_key = path.pop()
+		for key in path:
 			if not isinstance(current, dict):
 				raise Exception("Can't set the key of a non-dict")
-			current.setdefault(attr, {})
-			current = current[attr]
+			current.setdefault(key, {})
+			current = current[key]
 		if isinstance(value, PathDict):
-			current[last_path_attr] = value.data
+			current[last_path_key] = value.data
 		else:
-			current[last_path_attr] = value
+			current[last_path_key] = value
+
 
 
 	def apply_at_path(self, path: list, function: callable):
@@ -125,7 +138,7 @@ class PathDict(UserDict):
 		self.set_path(path, value=function(value))
 
 
-	def __getitem__(self, path) -> Any:
+	def __getitem__(self, path) -> Any | PathDict:
 		""" Subscript for <PathDict>.get_path() """
 		# If PathDict["key1"], then path="key1"
 		# PathDict["key1", "key2"], then path=tuple("key1", "key2")
