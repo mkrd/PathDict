@@ -178,7 +178,7 @@ It takes an init parameter, and a function with takes three arguments (eg. `lamb
 ```python
 joe = PathDict(user, deepcopy=True)
 
-# Remove all friends that are older than 33.
+# Sum of ages of all friends of joe
 friend_ages = joe.aggregate("friends", init=0, f=lambda k, v, a: a + v["age"])
 
 > friend_ages
