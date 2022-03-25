@@ -148,6 +148,13 @@ def initialization():
 
 
 @test()
+def test_list_gets():
+	users_dict = copy.deepcopy(users)
+	users_pd = PathDict(users_dict)
+
+	assert users_pd[["users", "2", "age"]] == 49
+
+@test()
 def test_get_path():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
@@ -321,5 +328,3 @@ def test_star_operations():
 	# names_2017 = winners["2017", "podium", "*", "name"]
 	# print(names_2017)
 	# assert names_2017 == ["Joe", "Ben", "Sue"]
-
-
