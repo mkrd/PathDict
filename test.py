@@ -31,6 +31,7 @@ class test:
 		except AssertionError:
 			print(colored_str_by_color_code(f"Test {method.__name__}() failed!", 91))
 			print(colored_str_by_color_code(traceback.format_exc(), 91))
+			raise
 		except BaseException:
 			raise
 		finally:
