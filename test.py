@@ -65,6 +65,7 @@ users = {
 
 @test()
 def test_deepcopy():
+	assert False
 	# Test deepcopy with object
 	class TestObject():
 		def __init__(self, data):
