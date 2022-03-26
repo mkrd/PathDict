@@ -232,3 +232,21 @@ class PathDict(UserDict):
 		for k, v in path_val.items():
 			agg = f(k, v, agg)
 		return agg
+
+	def __contains__(self, path) -> bool:
+		"""Check if the path is contained."""
+		path = self._convert_path_to_list(path)
+		contains = True
+		temp = self.dict
+		for k in path:
+			if not isinstance(temp, dict): # ignore value.
+				contains = False
+				break
+
+			if k in temp:
+				temp = temp[k]
+			else:
+				contains = False
+				break
+				
+		return contains
