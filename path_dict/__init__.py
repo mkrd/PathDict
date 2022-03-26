@@ -239,7 +239,7 @@ class PathDict(UserDict):
 		contains = True
 		temp = self.dict
 		for k in path:
-			if not isinstance(temp, dict): # ignore value.
+			if not isinstance(temp, dict): # ignore when temp is value object.
 				contains = False
 				break
 
