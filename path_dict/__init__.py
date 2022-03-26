@@ -164,32 +164,29 @@ class PathDict(UserDict):
 		# If PathDict["key1"], then path="key1"
 		# PathDict["key1", "key2"], then path=tuple("key1", "key2")
 		# We want path to be a list in any case
-		path = self._check_path_type(path)
+		path = self._convert_path_to_list(path)
 		return self.get_path(path)
 
 
 
 	def __setitem__(self, path, value: Callable | Any):
 		""" Subscript for <PathDict>.get_path() and <PathDict>.apply_at_path() """
-		path = self._check_path_type(path)
+		path = self._convert_path_to_list(path)
 		if callable(value):
 			self.apply_at_path(path, function=value)
 		else:
 			self.set_path(path, value=value)
-	
-	def _check_path_type(self, path) -> list:
-		"""Check path type and convert to list type."""
+
+
+
+	def _convert_path_to_list(self, path) -> list:
+		""" Check path type and convert to list type. """
 		if isinstance(path, list):
-			pass
-		elif isinstance(path, tuple):
-			path = list(path)
-		else:
-			path = [path]
-		
-		return path
-
-		
-
+			return path
+		if isinstance(path, tuple):
+			return list(path)
+		# In case of a simple value, return a list with that value
+		return [path]
 
 
 
