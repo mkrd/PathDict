@@ -236,17 +236,14 @@ class PathDict(UserDict):
 	def __contains__(self, path) -> bool:
 		"""Check if the path is contained."""
 		path = self._convert_path_to_list(path)
-		contains = True
 		temp = self.dict
 		for k in path:
-			if not isinstance(temp, dict): # ignore when temp is value object.
-				contains = False
-				break
+			if not isinstance(temp, dict):
+				return False
 
-			if k in temp:
-				temp = temp[k]
-			else:
-				contains = False
-				break
+			if k not in temp:
+				return False
+
+			temp = temp[k]
 				
-		return contains
+		return True
