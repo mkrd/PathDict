@@ -328,3 +328,17 @@ def test_star_operations():
 	# names_2017 = winners["2017", "podium", "*", "name"]
 	# print(names_2017)
 	# assert names_2017 == ["Joe", "Ben", "Sue"]
+
+@test()
+def test_contains():
+	users_dict = copy.deepcopy(users)
+	users_pd = PathDict(users_dict)
+	assert ("" in users_pd) == False 
+	assert ("total_users" in users_pd) == True 
+	assert (["premium_users", 1] in users_pd) == False 
+	assert (["users","1"] in users_pd) == True 
+	assert (["users","999999"] in users_pd) == False 
+	assert (["users","1","name"] in users_pd) == True
+	assert (["users","999999","name"] in users_pd) == False
+	assert (["users","1","name","joe"] in users_pd) == False 
+	assert (["users","1","name","joe","Brown"] in users_pd) == False # too many paths
