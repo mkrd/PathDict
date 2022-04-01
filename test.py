@@ -149,6 +149,13 @@ def initialization():
 
 
 @test()
+def test_list_gets():
+	users_dict = copy.deepcopy(users)
+	users_pd = PathDict(users_dict)
+
+	assert users_pd[["users", "2", "age"]] == 49
+
+@test()
 def test_get_path():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
@@ -323,4 +330,16 @@ def test_star_operations():
 	# print(names_2017)
 	# assert names_2017 == ["Joe", "Ben", "Sue"]
 
-
+@test()
+def test_contains():
+	users_dict = copy.deepcopy(users)
+	users_pd = PathDict(users_dict)
+	assert ("" in users_pd) == False 
+	assert ("total_users" in users_pd) == True 
+	assert (["premium_users", 1] in users_pd) == False 
+	assert (["users","1"] in users_pd) == True 
+	assert (["users","999999"] in users_pd) == False 
+	assert (["users","1","name"] in users_pd) == True
+	assert (["users","999999","name"] in users_pd) == False
+	assert (["users","1","name","joe"] in users_pd) == False 
+	assert (["users","1","name","joe","Brown"] in users_pd) == False # too many paths
