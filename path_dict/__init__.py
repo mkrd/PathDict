@@ -11,7 +11,8 @@ class PathDict(UserDict):
 		PathDict wraps a dict, with extra functions like
 		working with paths.
 	"""
-
+	# Explicitly define data attribute
+	data = None
 
 
 	# FIX wrong behavior of standard library
@@ -245,5 +246,5 @@ class PathDict(UserDict):
 				return False
 
 			temp = temp[k]
-				
+
 		return True
