@@ -31,7 +31,7 @@ video_id = "dsknvcalceiruz2892
 print(video[video_id, "metadata", "storage_path"])
 ```
 
-Much better. If any of the keys `video_id` or `"metadata"` or `"storage_path"` do not exist, it will not throw and error, but return `None`
+Much better! If any of the keys `video_id` or `"metadata"` or `"storage_path"` do not exist, it will not throw and error, but return `None`.
 
     
 ## Installation
@@ -47,7 +47,6 @@ from path_dict import PathDict
 
 ## Usage
 PathDict is like a normal python dict, but comes with some handy extras.
-
 
 
 ### Initialize
