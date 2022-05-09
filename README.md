@@ -17,8 +17,8 @@ videos: dict = {...}
 video_id = "dsknvcalceiruz2892
 
 if video_id in videos:
-	if "metadata" in video[video_id]["metadata"]
-		if "storage_path" in video[video_id]["metadata"]
+	if "metadata" in video[video_id]["metadata"]:
+		if "storage_path" in video[video_id]["metadata"]:
 			print(video[video_id]["metadata"]["storage_path"])
 ```
 
