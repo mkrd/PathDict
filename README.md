@@ -8,6 +8,32 @@
 The versatile dict for Python!
 
 
+# Why do I need this?
+Do you also hate to write nested checks to access a value deep inside a dict? Then PathDict is right for you!
+
+Example:Lets print the video storage path, but without throwing a KeyError:
+```python
+videos: dict = {...}
+video_id = "dsknvcalceiruz2892
+
+if video_id in videos:
+	if "metadata" in video[video_id]["metadata"]
+		if "storage_path" in video[video_id]["metadata"]
+			print(video[video_id]["metadata"]["storage_path"])
+```
+
+Annoying, right? This is whow we do it with a PathDict
+
+```python
+videos = PathDict({...})
+video_id = "dsknvcalceiruz2892
+
+print(video[video_id, "metadata", "storage_path"])
+```
+
+Much better. If any of the keys `video_id` or `"metadata"` or `"storage_path"` do not exist, it will not throw and error, but return `None`
+
+    
 ## Installation
 `pip3 install path-dict`
 
