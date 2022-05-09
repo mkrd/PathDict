@@ -11,7 +11,7 @@ The versatile dict for Python!
 # Why do I need this?
 Do you also hate to write nested checks to access a value deep inside a dict? Then PathDict is right for you!
 
-Example:Lets print the video storage path, but without throwing a KeyError:
+Example: Lets print the video storage path, but without throwing a KeyError:
 ```python
 videos: dict = {...}
 video_id = "dsknvcalceiruz2892
