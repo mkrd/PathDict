@@ -116,6 +116,9 @@ def referencing():
 
 @test()
 def initialization():
+	# Pre-checks
+	assert isinstance(None, PathDict) == False
+	assert PathDict().data == {}
 	# Empty
 	pd_empty = PathDict({})
 	assert pd_empty.dict == {}
@@ -146,6 +149,7 @@ def initialization():
 	assert dc_pd.dict is not users
 	dc_pd_deepcopy = dc_pd.deepcopy
 	assert dc_pd is not dc_pd_deepcopy
+
 
 
 @test()

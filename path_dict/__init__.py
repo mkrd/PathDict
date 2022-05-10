@@ -23,7 +23,7 @@ class PathDict(UserDict):
 
 
 
-	def __init__(self, data: dict | PathDict = {}, deep_copy: bool = False):
+	def __init__(self, data: dict | PathDict = None, deep_copy: bool = False):
 		"""
 			Initialize with a dict or another PathDict.
 			This will reference the original dict or PathDict,
@@ -34,12 +34,10 @@ class PathDict(UserDict):
 			self.data = data.data
 		elif isinstance(data, dict):
 			self.data = data
+		elif data is None:
+			self.data = {}
 		else:
 			raise TypeError("PathDict init: data argument must be a dict or PathDict")
-
-		# Prevent referencing the default value of the data argument
-		if data is self.__init__.__defaults__[0]:
-			self.data = {}
 
 		# If deep_copy is True, make a deep copy of the data
 		if deep_copy:
