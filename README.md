@@ -1,55 +1,83 @@
-# PathDict
+PathDict
+================================================================================
 
 [![Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
 [![Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
 [![Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
 
+Why do I need this?
+================================================================================
 
-The versatile dict for Python!
+Do you also hate to write nested checks to access a nested value in a dict?
+Then PathDict is right for you!
 
-
-# Why do I need this?
-Do you also hate to write nested checks to access a value deep inside a dict? Then PathDict is right for you!
-
-Example: Lets print the video storage path, but without throwing a KeyError:
+Example: Lets consider the following dict filled with users. Notice how Bob has
+provided sports interests only, and Julia has provided music interests only.
 ```python
-videos: dict = {...}
-video_id = "dsknvcalceiruz2892
-
-if video_id in videos:
-	if "metadata" in video[video_id]["metadata"]:
-		if "storage_path" in video[video_id]["metadata"]:
-			print(video[video_id]["metadata"]["storage_path"])
+db = {
+    "bob": {
+        "interests": {
+            "sports": ["soccer", "basketball"]
+        }
+    },
+    "julia": {
+        "interests": {
+            "music": ["pop", "alternative"]
+        }
+    }
+}
 ```
 
-Annoying, right? This is whow we do it with a PathDict
+Lets print the music interests of each user:
 
 ```python
-videos = PathDict({...})
-video_id = "dsknvcalceiruz2892
+for user_name in db:
+	user_music = None
+	if user_name in db:
+		if "interests" in db[user_name]:
+			if "music" in db[user_name]["interests"]:
+				user_music = db[user_name]["interests"]["music"]
+	print(user_music)
 
-print(video[video_id, "metadata", "storage_path"])
+# ---> None
+# ---> ["pop", "alternative"]
 ```
 
-Much better! If any of the keys `video_id` or `"metadata"` or `"storage_path"` do not exist, it will not throw and error, but return `None`.
+**Annoying, right?** This is how we do it with a PathDict:
 
-    
-## Installation
+```python
+db = PathDict(db)
+for user_name in db:
+	print(db[user_name, "interests", "music"])
+
+# ---> None
+# ---> ["pop", "alternative"]
+
+```
+
+**Much better!** If any of the keys do not exist, it will not throw and error,
+but return `None`.
+
+If we tried this with a normal dict, we would have gotten a `KeyError`.
+
+The same also works for setting values, if the path does not exist, it will be
+created.
+
+Installation
+================================================================================
+
 `pip3 install path-dict`
-
-Import:
 
 ```python
 from path_dict import PathDict
 ```
 
+Usage
+================================================================================
 
-
-## Usage
 PathDict is like a normal python dict, but comes with some handy extras.
 
-
-### Initialize
+## Initialize
 
 ```python
 # Empty PathDict
@@ -57,7 +85,6 @@ pd = PathDict()
 
 > pd
 ---> PathDict({})
-
 ```
 
 A PathDict keeps a reference to the original initializing dict:
@@ -89,9 +116,7 @@ joe = PathDict(user, deepcopy=True)
 ---> False
 ```
 
-
-
-### Getting and setting values with paths
+## Getting and setting values with paths
 
 You can use paths of keys to access values:
 
@@ -125,7 +150,7 @@ joe = PathDict(user, deepcopy=True)
 
 
 
-### Most dict methods are supported
+## Most dict methods are supported
 
 Many of the usual dict methods work with PathDict:
 
@@ -146,8 +171,7 @@ for value in pathdict.values():
 
 ```
 
-
-### Apply a function at a path
+## Apply a function at a path
 
 When setting a value, you can use a lambda function to modify the value at a given path.
 The function should take one argument and return the modified value.
@@ -164,13 +188,11 @@ if "total" not in stats_dict["views"]:
 	 stats_dict["views"]["total"] = 0
 stats_dict["views"]["total"] += 1
 
-# You can achieve the same using a PathDict:
+# Using a PathDict:
 stats_pd["views", "total"] = lambda x: (x or 0) + 1
 ```
 
-
-
-### Filtering
+## Filtering
 
 PathDicts offer a filter function, which can filter a list or a PathDict at a given path in-place.
 
@@ -194,8 +216,7 @@ joe.filter("friends", f=lambda k, v: v["age"] < 33)
 })
 ```
 
-
-### Aggregating
+## Aggregating
 
 The aggregate function can combine a PathDict to a single aggregated value.
 It takes an init parameter, and a function with takes three arguments (eg. `lambda key, val, agg`)
@@ -210,7 +231,7 @@ friend_ages = joe.aggregate("friends", init=0, f=lambda k, v, a: a + v["age"])
 ---> 65
 ```
 
-### Serialize to JSON
+## Serialize to JSON
 
 To serialize a PathDict to JSON, call `json.dumps(path_dict.dict)`.
 If you try to serialize a PathDict object itself, the operation will fail.
