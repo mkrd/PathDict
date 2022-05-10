@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "path_dict"
-version = "1.2.3"
+version = "1.2.5"
 repository = "https://github.com/mkrd/PathDict"
-description = "The versatile dict for Python!"
+description = "Better dict for Python!"
 authors = ["Marcel Kröker <kroeker.marcel@gmail.com>"]
 license = "MIT"
 readme = "README.md"

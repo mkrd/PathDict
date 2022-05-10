@@ -75,7 +75,8 @@ from path_dict import PathDict
 Usage
 ================================================================================
 
-PathDict is like a normal python dict, but comes with some handy extras.
+PathDict subclasses [collections.UserDict](https://docs.python.org/3/library/collections.html#collections.UserDict),
+so it behaves almist like a normal python dict, but comes with some handy extras.
 
 ## Initialize
 
