@@ -72,6 +72,25 @@ class PathDict(UserDict):
 
 
 
+	def _expand_star_path(self, path: list) -> list[list]:
+		"""
+			Expand the given path containing "*" to a list of paths where all "*" have been expanded by all keys.
+		"""
+		paths = [[]]
+		for key in path:
+			if key != "*":
+				# Extend all paths by the key if it is not "*"
+				paths = [path + [key] for path in paths]
+			else:
+				# Now key is "*", expand all paths by all keys at the respective path
+				paths = [p + [k] for p in paths for k in self.get_path(p).keys()]
+
+		# Return empty list if no paths were found
+		# paths = paths if paths != [[]] else []
+		return paths
+
+
+
 	def get_path(self, path: list) -> PathDict | Any:
 		"""
 			Get the value of the json object at the given path
@@ -95,6 +114,17 @@ class PathDict(UserDict):
 		if isinstance(current, dict):
 			return PathDict(current)
 		return current
+
+
+
+	def get_at_star_path(self, path: list):
+		if "*" not in path:
+			return self.get_path(path)
+		else:
+			res = []
+			for expanded_path in self._expand_star_path(path):
+				res.append(self.get_path(expanded_path))
+			return res
 
 
 
@@ -128,26 +158,14 @@ class PathDict(UserDict):
 
 
 
-	def _expand_star_path(self, path: list) -> list:
-		"""
-			Expand the given path containing "*" to a list of paths where all "*" have been expanded by all keys.
-		"""
-		paths = [[]]
-		for key in path:
-			if key != "*":
-				# Extend all paths by the key if it is not "*"
-				paths = [path + [key] for path in paths]
-			else:
-				# Now key is "*", expand all paths by all keys at the respective path
-				paths = [p + [k] for p in paths for k in self.get_path(p).keys()]
-
-		# Return empty list if no paths were found
-		paths = paths if paths != [[]] else []
-		return paths
+	def set_at_star_path(self, path: list, value=None):
+		# print(path, self._expand_star_path(path))
+		for expanded_path in self._expand_star_path(path):
+			self.set_path(expanded_path, value)
 
 
 
-	def apply_at_path(self, path: list, function: Callable):
+	def apply_at_star_path(self, path: list, function: Callable):
 		"""
 			At a given path, apply the given function
 			to the value at that path.
@@ -163,18 +181,18 @@ class PathDict(UserDict):
 		# If PathDict["key1"], then path="key1"
 		# PathDict["key1", "key2"], then path=tuple("key1", "key2")
 		# We want path to be a list in any case
-		path = self._convert_path_to_list(path)
-		return self.get_path(path)
+		path = list(path) if isinstance(path, tuple) else [path]
+		return self.get_at_star_path(path)
 
 
 
 	def __setitem__(self, path, value: Callable | Any):
-		""" Subscript for <PathDict>.get_path() and <PathDict>.apply_at_path() """
-		path = self._convert_path_to_list(path)
+		""" Subscript for <PathDict>.get_path() and <PathDict>.apply_at_star_path() """
+		path = list(path) if isinstance(path, tuple) else [path]
 		if callable(value):
-			self.apply_at_path(path, function=value)
+			self.apply_at_star_path(path, function=value)
 		else:
-			self.set_path(path, value=value)
+			self.set_at_star_path(path, value=value)
 
 
 

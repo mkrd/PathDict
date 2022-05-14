@@ -306,7 +306,13 @@ def test_star_operations():
 		},
 	})
 
-	# assert winners == winners["*"]
+
+	# Get names of all winners
+	winners = winners_original.deepcopy
+	assert winners["*", "podium", "*", "name"] == [
+		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
+	]
+
 
 
 	# Increment age of all users by 1
