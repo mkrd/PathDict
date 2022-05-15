@@ -150,13 +150,12 @@ def initialization():
 	assert dc_pd is not dc_pd_deepcopy
 
 
-
 @test()
 def test_list_gets():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
-
 	assert users_pd[["users", "2", "age"]] == 49
+
 
 @test()
 def test_get_path():
@@ -282,9 +281,6 @@ def test_PathDict():
 	}
 
 
-
-
-
 @test()
 def test_star_operations():
 	winners_original = PathDict({
@@ -328,13 +324,9 @@ def test_star_operations():
 	# winners = winners_original.deepcopy
 	# winners["*", "podium", "*"] = lambda x: x["age"] += 1 if "B" in x["name"] else x["age"] == 0
 
-
-
-
 	# print("GO")
 	# assert AssertionError()
 	# print(winners)
-
 
 	# names_2017 = winners["2017", "podium", "*", "name"]
 	# print(names_2017)

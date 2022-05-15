@@ -107,7 +107,10 @@ class PathDict(UserDict):
 		current = self.data
 		for key in path:
 			if not isinstance(current, dict):
-				raise Exception(f"The path {path} is not a stack of nested dicts (value at key {key} has type {type(current)})")
+				raise KeyError(
+					f"The path {path} is not a stack of nested "
+					f"dicts (value at key {key} has type {type(current)})"
+				)
 			if key not in current:
 				return None
 			current = current[key]
@@ -148,7 +151,7 @@ class PathDict(UserDict):
 		last_path_key = path.pop()
 		for key in path:
 			if not isinstance(current, dict):
-				raise Exception("Can't set the key of a non-dict")
+				raise KeyError("Can't set the key of a non-dict")
 			current.setdefault(key, {})
 			current = current[key]
 		if isinstance(value, PathDict):
@@ -244,7 +247,7 @@ class PathDict(UserDict):
 		"""
 		path_val = self[path]
 		if not isinstance(path_val, PathDict):
-			raise Exception("Aggregate only works on dicts")
+			raise LookupError("Aggregate only works on dicts")
 		agg = init
 		for k, v in path_val.items():
 			agg = f(k, v, agg)
