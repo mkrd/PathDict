@@ -20,4 +20,4 @@ jobs:
         pip install pylint
     - name: Execute Tests
       run: |
-        python3 test.py
+        pytest --cov=path_dict test_all.py --cov-report term-missing
