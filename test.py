@@ -38,7 +38,6 @@ class test:
 			self.teardown()
 
 
-
 # Dict for testing purposes
 users = {
 	"total_users": 3,
@@ -63,6 +62,7 @@ users = {
 		["Ben", "Joe"],
 	]
 }
+
 
 @test()
 def test_deepcopy():
@@ -96,9 +96,8 @@ def referencing():
 	}
 	for a in p_table:
 		for b in p_table:
-			if a == b:
-				continue
-			assert p_table[a].data is not p_table[b].data
+			if a != b:
+				assert p_table[a].data is not p_table[b].data
 
 	shared_d1 = {}
 	p1_with_shared_d1 = PathDict(shared_d1)
@@ -117,7 +116,7 @@ def referencing():
 @test()
 def initialization():
 	# Pre-checks
-	assert isinstance(None, PathDict) == False
+	assert not isinstance(None, PathDict)
 	assert PathDict().data == {}
 	# Empty
 	pd_empty = PathDict({})
@@ -221,6 +220,7 @@ def test_aggregate():
 	users_pd = PathDict(users, deep_copy=True)
 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
 	assert users_ages == 103
+
 
 @test()
 def test_PathDict():
@@ -340,16 +340,17 @@ def test_star_operations():
 	# print(names_2017)
 	# assert names_2017 == ["Joe", "Ben", "Sue"]
 
+
 @test()
 def test_contains():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
-	assert ("" in users_pd) == False
-	assert ("total_users" in users_pd) == True
-	assert (["premium_users", 1] in users_pd) == False
-	assert (["users","1"] in users_pd) == True
-	assert (["users","999999"] in users_pd) == False
-	assert (["users","1","name"] in users_pd) == True
-	assert (["users","999999","name"] in users_pd) == False
-	assert (["users","1","name","joe"] in users_pd) == False
-	assert (["users","1","name","joe","Brown"] in users_pd) == False # too many paths
+	assert "" not in users_pd
+	assert "total_users" in users_pd
+	assert ["premium_users", 1] not in users_pd
+	assert ["users", "1"] in users_pd
+	assert ["users", "999999"] not in users_pd
+	assert ["users", "1", "name"] in users_pd
+	assert ["users", "999999", "name"] not in users_pd
+	assert ["users", "1", "name", "joe"] not in users_pd
+	assert ["users", "1", "name", "joe", "Brown"] not in users_pd  # too many paths
