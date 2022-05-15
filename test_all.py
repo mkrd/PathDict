@@ -83,7 +83,7 @@ def test_deepcopy():
 		raise AssertionError("pd.deepcopy failed")
 
 
-def referencing():
+def test_referencing():
 	p_table = {
 		"p1": PathDict(),
 		"p2": PathDict(),
@@ -109,7 +109,7 @@ def referencing():
 	assert p3_with_shared_d1.data is p1_with_shared_d1.data
 
 
-def initialization():
+def test_initialization():
 	# Pre-checks
 	assert not isinstance(None, PathDict)
 	assert PathDict().data == {}
@@ -158,6 +158,9 @@ def test_get_path():
 	assert users_pd["users", "1", "name"] == "Joe"
 	# Non existent but correct paths return None
 	assert users_pd["users", "-1", "name"] is None
+	# Non path returns None
+	assert users_pd.get_path(2) is None
+	assert users_pd[2] is None
 	# If value is not a dict, return that value
 	assert isinstance(users_pd["follows"], list)
 	# If value is a dict, return a PathDict
