@@ -71,6 +71,31 @@ class PathDict(UserDict):
 		return f"PathDict({dump})"
 
 
+	####
+	####
+	####
+	####
+	############################################################################
+	#### Utils
+	############################################################################
+
+
+	def _convert_path_to_list(self, path) -> list:
+		"""
+		Check path type and convert to list type.
+		"""
+		# If tuple, convert to list
+		if isinstance(path, tuple):
+			return list(path)
+
+		# If list, leave as is
+		if isinstance(path, list):
+			return path
+
+		# Else, convert to single item list
+		return [path]
+
+
 
 	def _expand_star_path(self, path: list) -> list[list]:
 		"""
@@ -90,6 +115,14 @@ class PathDict(UserDict):
 		return paths
 
 
+	####
+	####
+	####
+	####
+	############################################################################
+	#### Getters
+	############################################################################
+
 
 	def get_path(self, path: list) -> PathDict | Any:
 		"""
@@ -99,8 +132,8 @@ class PathDict(UserDict):
 			Empty paths ([]) or invalid paths return None.
 		"""
 		if not isinstance(path, list):
-			return None
-		if path == []:
+			raise TypeError("PathDict.get_path: path must be a list")
+		if not path:
 			return self
 
 		# Iterate over the path to safely get the value
@@ -119,15 +152,27 @@ class PathDict(UserDict):
 		return current
 
 
+	def __getitem__(self, path) -> Any | PathDict | list:
+		""" Subscript for <PathDict>.get_path() """
+		# We want path to be a list in any case
+		path_list = self._convert_path_to_list(path)
 
-	def get_at_star_path(self, path: list):
-		if "*" not in path:
-			return self.get_path(path)
-		res = []
-		for expanded_path in self._expand_star_path(path):
-			res.append(self.get_path(expanded_path))
-		return res
+		# Use normal get_path if no wildcards are used
+		if "*" not in path_list:
+			return self.get_path(path_list)
 
+		# If wildcards are used, return a list of all values
+		expanded_paths = self._expand_star_path(path_list)
+		return [self.get_path(p) for p in expanded_paths]
+
+
+	####
+	####
+	####
+	####
+	############################################################################
+	#### Setters and Apply
+	############################################################################
 
 
 	def set_path(self, path: list, value=None):
@@ -159,12 +204,10 @@ class PathDict(UserDict):
 			current[last_path_key] = value
 
 
-
 	def set_at_star_path(self, path: list, value=None):
 		# print(path, self._expand_star_path(path))
 		for expanded_path in self._expand_star_path(path):
 			self.set_path(expanded_path, value)
-
 
 
 	def apply_at_star_path(self, path: list, function: Callable):
@@ -178,23 +221,6 @@ class PathDict(UserDict):
 
 
 
-	def __getitem__(self, path) -> Any | PathDict | list:
-		""" Subscript for <PathDict>.get_path() """
-		# We want path to be a list in any case
-
-		# If tuple, convert to list
-		if isinstance(path, tuple):
-			return self.get_at_star_path(list(path))
-
-		# If list, leave as is
-		if isinstance(path, list):
-			return self.get_at_star_path(path)
-
-		# Else, convert to single item list
-		return self.get_at_star_path([path])
-
-
-
 	def __setitem__(self, path, value: Callable | Any):
 		""" Subscript for <PathDict>.get_path() and <PathDict>.apply_at_star_path() """
 		path = list(path) if isinstance(path, tuple) else [path]
@@ -205,14 +231,6 @@ class PathDict(UserDict):
 
 
 
-	def _convert_path_to_list(self, path) -> list:
-		""" Check path type and convert to list type. """
-		if isinstance(path, list):
-			return path
-		if isinstance(path, tuple):
-			return list(path)
-		# In case of a simple value, return a list with that value
-		return [path]
 
 
 

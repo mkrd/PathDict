@@ -1,6 +1,8 @@
+from importlib.resources import path
+from typing import Type
 from path_dict import PathDict
 import copy
-
+import pytest
 
 
 
@@ -117,12 +119,9 @@ def test_initialization():
 	pd_empty = PathDict({})
 	assert pd_empty.dict == {}
 	# Wrong inits
-	for wrong in ["", None, 1, [1]]:
-		try:
-			_ = PathDict(wrong)
-			assert False
-		except Exception:
-			assert True
+	for wrong in ["", 1, [1]]:
+		with pytest.raises(TypeError):
+			PathDict(wrong)
 	# Init with PathDict
 	init_pd = PathDict({"test": 1})
 	pd_from_pd = PathDict(init_pd)
@@ -159,7 +158,9 @@ def test_get_path():
 	# Non existent but correct paths return None
 	assert users_pd["users", "-1", "name"] is None
 	# Non path returns None
-	assert users_pd.get_path(2) is None
+	with pytest.raises(TypeError):
+		users_pd.get_path(2)
+
 	assert users_pd[2] is None
 	# If value is not a dict, return that value
 	assert isinstance(users_pd["follows"], list)
@@ -167,11 +168,8 @@ def test_get_path():
 	assert isinstance(users_pd["users"], PathDict)
 	assert users_pd["users"].dict is users_dict["users"]
 	# Wrong path accesses, eg. get key on list, raise an exception
-	try:
-		_ = users_pd["follows", 0]
-		assert False
-	except BaseException:
-		assert True
+	with pytest.raises(KeyError):
+		users_pd["follows", 0]
 
 
 def test_filter():
