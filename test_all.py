@@ -1,41 +1,39 @@
 from path_dict import PathDict
-from typing import Callable
 import copy
-import time
-import traceback
 
 
 
-def colored_str_by_color_code(s, color_code):
-	res = "\033["
-	res += f"{color_code}m{s}"
-	res += "\033[0m"
-	return res
+
+# def colored_str_by_color_code(s, color_code):
+# 	res = "\033["
+# 	res += f"{color_code}m{s}"
+# 	res += "\033[0m"
+# 	return res
 
 
 
-class test:
-	""" A decorator that runs tests automatically and provides teardown and setup """
-	def __init__(self, setup: Callable = lambda: None, teardown: Callable = lambda: None):
-		self.setup = setup
-		self.teardown = teardown
+# class test:
+# 	""" A decorator that runs tests automatically and provides teardown and setup """
+# 	def __init__(self, setup: Callable = lambda: None, teardown: Callable = lambda: None):
+# 		self.setup = setup
+# 		self.teardown = teardown
 
-	def __call__(self, method):
-		self.setup()
-		try:
-			t1 = time.time()
-			method()
-			t2 = time.time()
-			ms = f"{((t2 - t1) * 1000):.1f}ms"
-			print(colored_str_by_color_code(f"Test {method.__name__}() finished in {ms}", 92))
-		except AssertionError:
-			print(colored_str_by_color_code(f"Test {method.__name__}() failed!", 91))
-			print(colored_str_by_color_code(traceback.format_exc(), 91))
-			raise
-		except BaseException:
-			raise
-		finally:
-			self.teardown()
+# 	def __call__(self, method):
+# 		self.setup()
+# 		try:
+# 			t1 = time.time()
+# 			method()
+# 			t2 = time.time()
+# 			ms = f"{((t2 - t1) * 1000):.1f}ms"
+# 			print(colored_str_by_color_code(f"Test {method.__name__}() finished in {ms}", 92))
+# 		except AssertionError:
+# 			print(colored_str_by_color_code(f"Test {method.__name__}() failed!", 91))
+# 			print(colored_str_by_color_code(traceback.format_exc(), 91))
+# 			raise
+# 		except BaseException:
+# 			raise
+# 		finally:
+# 			self.teardown()
 
 
 # Dict for testing purposes
@@ -64,7 +62,6 @@ users = {
 }
 
 
-@test()
 def test_deepcopy():
 	# Test deepcopy with object
 	class TestObject():
@@ -86,7 +83,6 @@ def test_deepcopy():
 		raise AssertionError("pd.deepcopy failed")
 
 
-@test()
 def referencing():
 	p_table = {
 		"p1": PathDict(),
@@ -113,7 +109,6 @@ def referencing():
 	assert p3_with_shared_d1.data is p1_with_shared_d1.data
 
 
-@test()
 def initialization():
 	# Pre-checks
 	assert not isinstance(None, PathDict)
@@ -150,14 +145,12 @@ def initialization():
 	assert dc_pd is not dc_pd_deepcopy
 
 
-@test()
 def test_list_gets():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
 	assert users_pd[["users", "2", "age"]] == 49
 
 
-@test()
 def test_get_path():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
@@ -178,7 +171,6 @@ def test_get_path():
 		assert True
 
 
-@test()
 def test_filter():
 	users_pd = PathDict(users, deep_copy=True)
 
@@ -214,14 +206,12 @@ def test_filter():
 
 
 
-@test()
 def test_aggregate():
 	users_pd = PathDict(users, deep_copy=True)
 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
 	assert users_ages == 103
 
 
-@test()
 def test_PathDict():
 	d = {
 		"total_users": 3,
@@ -281,7 +271,6 @@ def test_PathDict():
 	}
 
 
-@test()
 def test_star_operations():
 	winners_original = PathDict({
 		"2017": {
@@ -333,7 +322,6 @@ def test_star_operations():
 	# assert names_2017 == ["Joe", "Ben", "Sue"]
 
 
-@test()
 def test_contains():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
