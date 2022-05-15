@@ -234,7 +234,6 @@ class PathDict(UserDict):
 			self[path] = [x for x in list(path_val) if f(x)]
 
 
-
 	def filtered(self, *path, f: Callable = None):
 		"""
 			Like filter, but does not modify this object,
@@ -243,7 +242,6 @@ class PathDict(UserDict):
 		deepcopy = self.deepcopy
 		deepcopy.filter(*path, f=f)
 		return deepcopy
-
 
 
 	def aggregate(self, *path, init=None, f: Callable = None):
@@ -258,6 +256,7 @@ class PathDict(UserDict):
 		for k, v in path_val.items():
 			agg = f(k, v, agg)
 		return agg
+
 
 	def __contains__(self, path) -> bool:
 		"""Check if the path is contained."""
