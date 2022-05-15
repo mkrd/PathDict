@@ -123,11 +123,10 @@ class PathDict(UserDict):
 	def get_at_star_path(self, path: list):
 		if "*" not in path:
 			return self.get_path(path)
-		else:
-			res = []
-			for expanded_path in self._expand_star_path(path):
-				res.append(self.get_path(expanded_path))
-			return res
+		res = []
+		for expanded_path in self._expand_star_path(path):
+			res.append(self.get_path(expanded_path))
+		return res
 
 
 
@@ -179,13 +178,20 @@ class PathDict(UserDict):
 
 
 
-	def __getitem__(self, path) -> Any | PathDict:
+	def __getitem__(self, path) -> Any | PathDict | list:
 		""" Subscript for <PathDict>.get_path() """
-		# If PathDict["key1"], then path="key1"
-		# PathDict["key1", "key2"], then path=tuple("key1", "key2")
 		# We want path to be a list in any case
-		path = list(path) if isinstance(path, tuple) else [path]
-		return self.get_at_star_path(path)
+
+		# If tuple, convert to list
+		if isinstance(path, tuple):
+			return self.get_at_star_path(list(path))
+
+		# If list, leave as is
+		if isinstance(path, list):
+			return self.get_at_star_path(path)
+
+		# Else, convert to single item list
+		return self.get_at_star_path([path])
 
 
 
