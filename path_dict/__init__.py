@@ -15,7 +15,7 @@ class PathDict(UserDict):
 	data = None
 
 
-	# FIX wrong behavior of standard library
+	# FIX wrong behavior of standard library of UserDict
 	# <a>.pop(<b>, None) returns key error, if <b> not in <a>.
 	# This fixes it.
 	def pop(self, key, *args):
@@ -107,7 +107,7 @@ class PathDict(UserDict):
 				# Extend all paths by the key if it is not "*"
 				paths = [path + [key] for path in paths]
 			else:
-				# Now key is "*", expand all paths by all keys at the respective path
+				# If key is "*", expand all paths by all keys at the respective path
 				paths = [p + [k] for p in paths for k in self.get_path(p).keys()]
 
 		# Return empty list if no paths were found
