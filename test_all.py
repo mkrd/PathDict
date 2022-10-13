@@ -6,38 +6,6 @@ import pytest
 
 
 
-# def colored_str_by_color_code(s, color_code):
-# 	res = "\033["
-# 	res += f"{color_code}m{s}"
-# 	res += "\033[0m"
-# 	return res
-
-
-
-# class test:
-# 	""" A decorator that runs tests automatically and provides teardown and setup """
-# 	def __init__(self, setup: Callable = lambda: None, teardown: Callable = lambda: None):
-# 		self.setup = setup
-# 		self.teardown = teardown
-
-# 	def __call__(self, method):
-# 		self.setup()
-# 		try:
-# 			t1 = time.time()
-# 			method()
-# 			t2 = time.time()
-# 			ms = f"{((t2 - t1) * 1000):.1f}ms"
-# 			print(colored_str_by_color_code(f"Test {method.__name__}() finished in {ms}", 92))
-# 		except AssertionError:
-# 			print(colored_str_by_color_code(f"Test {method.__name__}() failed!", 91))
-# 			print(colored_str_by_color_code(traceback.format_exc(), 91))
-# 			raise
-# 		except BaseException:
-# 			raise
-# 		finally:
-# 			self.teardown()
-
-
 # Dict for testing purposes
 users = {
 	"total_users": 3,
@@ -335,3 +303,78 @@ def test_contains():
 	assert ["users", "999999", "name"] not in users_pd
 	assert ["users", "1", "name", "joe"] not in users_pd
 	assert ["users", "1", "name", "joe", "Brown"] not in users_pd  # too many paths
+
+
+
+
+def test_basic_star_path():
+	db = {
+		"a": {
+			"a1": 1,
+			"a2": 2,
+			"a3": 3,
+		},
+		"b": {
+			"b1": 4,
+			"b2": 5,
+			"b3": 6,
+		},
+	}
+
+	pd = PathDict(db)
+
+	# Finds all values, returns as list
+	assert pd["*"] == [
+		{
+			"a1": 1,
+			"a2": 2,
+			"a3": 3,
+		},
+		{
+			"b1": 4,
+			"b2": 5,
+			"b3": 6,
+		},
+	]
+
+	print(pd["*", "a1"])
+	assert pd["*", "a1"] == [1, None]
+	assert pd["*", "*"] == [1, 2, 3, 4, 5, 6]
+
+
+
+def test_basic_star_path_2():
+	pd = PathDict({
+		"1": {
+			"name": "Joe",
+			"age": 22,
+			"interests": ["Python", "C++", "C#"],
+		},
+		"2": {
+			"name": "Ben",
+			"age": 49,
+			"interests": ["Javascript", "C++", "Haskell"],
+		},
+		"3": {
+			"name": "Sue",
+			"age": 36,
+			"interests": ["Python", "C++", "C#"],
+		},
+	})
+
+	ages = pd["*", "age"]
+	assert ages == [22, 49, 36]
+
+	ages_sum = sum(pd["*", "age"])
+	assert ages_sum == 107
+
+	# ages_over_30 = pd.filtered("*", "age", f=lambda x: x > 30)
+	# print(ages_over_30)
+	# assert ages_over_30 == [49, 36]
+
+	interests = pd["*", "interests"]
+	assert interests == [
+		["Python", "C++", "C#"],
+		["Javascript", "C++", "Haskell"],
+		["Python", "C++", "C#"],
+	]
