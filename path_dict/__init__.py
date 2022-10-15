@@ -15,10 +15,11 @@ class PathDict(UserDict):
 	data = None
 
 
-	# FIX wrong behavior of standard library of UserDict
-	# <a>.pop(<b>, None) returns key error, if <b> not in <a>.
-	# This fixes it.
+
 	def pop(self, key, *args):
+		# FIX wrong behavior of standard library of UserDict
+		# <a>.pop(<b>, None) returns key error, if <b> not in <a>.
+		# This fixes it.
 		return self.data.pop(key, *args)
 
 
