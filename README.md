@@ -18,15 +18,15 @@ Lets look at this dict:
 
 ```python
 users = {
-    "u1": {
-		"name": "Julia",
-		"age": 32,
+"u1": {
+        "name": "Julia",
+        "age": 32,
         "interests": ["soccer", "basketball"],
     },
     "u2": {
-		"name": "Ben",
-		"age": 26,
-        "interests": ["pop", "alternative"]
+        "name": "Ben",
+        "age": 26,
+        "interests": ["airplanes", "alternative music"]
     }
 }
 ```
@@ -81,12 +81,12 @@ Lets print the music interests of each user using normal dicts:
 
 ```python
 for user_name in db:
-	user_music = None
-	if user_name in db:
-		if "interests" in db[user_name]:
-			if "music" in db[user_name]["interests"]:
-				user_music = db[user_name]["interests"]["music"]
-	print(user_music)
+    user_music = None
+    if user_name in db:
+        if "interests" in db[user_name]:
+            if "music" in db[user_name]["interests"]:
+                user_music = db[user_name]["interests"]["music"]
+    print(user_music)
 
 # ---> None
 # ---> ["pop", "alternative"]
@@ -97,7 +97,7 @@ for user_name in db:
 ```python
 db = PathDict(db)
 for user_name in db:
-	print(db[user_name, "interests", "music"])
+    print(db[user_name, "interests", "music"])
 
 # ---> None
 # ---> ["pop", "alternative"]
@@ -141,13 +141,13 @@ A PathDict keeps a reference to the original initializing dict:
 
 ```python
 user = {
-	"name": "Joe",
-	"age": 22,
-	"hobbies": ["Playing football", "Podcasts"]
-	"friends": {
-		"Sue": {"age": 30},
-		"Ben": {"age": 35},
-	}
+    "name": "Joe",
+    "age": 22,
+    "hobbies": ["Playing football", "Podcasts"]
+    "friends": {
+        "Sue": {"age": 30},
+        "Ben": {"age": 35},
+    }
 }
 joe = PathDict(user)
 > joe == user
@@ -208,16 +208,16 @@ Many of the usual dict methods work with PathDict:
 pathdict = ...
 
 for key, value in pathdict.items():
-	...
+    ...
 
 for key in pathdict:
-	...
+    ...
 
 for key in pathdict.keys():
-	...
+    ...
 
 for value in pathdict.values():
-	...
+    ...
 
 ```
 
@@ -233,9 +233,9 @@ stats_pd = PathDict({})
 
 # Using a standard dict:
 if "views" not in stats_dict:
-	stats_dict["views"] = {}
+    stats_dict["views"] = {}
 if "total" not in stats_dict["views"]:
-	 stats_dict["views"]["total"] = 0
+     stats_dict["views"]["total"] = 0
 stats_dict["views"]["total"] += 1
 
 # Using a PathDict:
@@ -262,7 +262,7 @@ joe.filter("friends", f=lambda k, v: v["age"] < 33)
 
 > joe["friends"]
 ---> PathDict({
-	"Sue": {"age": 30}
+    "Sue": {"age": 30}
 })
 ```
 
