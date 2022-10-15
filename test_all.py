@@ -170,12 +170,22 @@ def test_filter():
 	users_pd = PathDict(users, deep_copy=True)
 
 	users_filtered = users_pd.filtered("users", f=lambda k, v: v["age"] <= 30)
-	assert users_filtered["users"] == {
+	users_filtered_forgot_f = users_pd.filtered("users", (lambda k, v: v["age"] <= 30))
+
+	expected = {
 		"1": {
 			"age": 22,
 			"name": "Joe"
 		}
 	}
+
+	# print(users_filtered_forgot_f)
+
+	assert users_filtered["users"] == expected
+	assert users_filtered_forgot_f["users"] == expected
+
+
+
 	assert isinstance(users_filtered, PathDict)
 
 	premium_users = users_pd["users"].filtered(f=lambda k, v: int(k) in users_pd["premium_users"])

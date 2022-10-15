@@ -226,7 +226,7 @@ class PathDict(UserDict):
 
 	def __setitem__(self, path, value: Callable | Any):
 		""" Subscript for <PathDict>.get_path() and <PathDict>.apply_at_star_path() """
-		path = list(path) if isinstance(path, tuple) else [path]
+		path = self._convert_path_to_list(path)
 		if callable(value):
 			self.apply_at_star_path(path, function=value)
 		else:
@@ -244,15 +244,24 @@ class PathDict(UserDict):
 			For dicts: filter(path, f=lambda key, val: ...)
 			For lists: filter(path, f=lambda ele: ...)
 		"""
-		path_val = self[path]
+
+		path_list = self._convert_path_to_list(path)
+
+		# If the f=... kwarg is forgotten and the function is passed as the
+		# last positional argument, we pop it from the path list and set it as f
+		if len(path_list) > 0 and callable(path_list[-1]) and f is None:
+			f = path_list.pop()
+
+		path_val = self[path_list]
 		if isinstance(path_val, PathDict):
 			filtered = PathDict({})
 			for k, v in path_val.items():
 				if f(k, v):
 					filtered[k] = v
-			self[path] = filtered
+
+			self[path_list] = filtered
 		elif isinstance(path_val, list):
-			self[path] = [x for x in list(path_val) if f(x)]
+			self[path_list] = [x for x in list(path_val) if f(x)]
 
 
 	def filtered(self, *path, f: Callable = None):
