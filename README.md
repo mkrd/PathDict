@@ -1,11 +1,10 @@
 
 ![Logo](/artwork/logo.png?raw=true)
 
-[![Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
-[![Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
-[![Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
-![example workflow](https://github.com/mkrd/PathDict/actions/workflows/test.yml/badge.svg
-)
+[![Total Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
+[![Monthly Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
+[![Weekly Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
+![Tests](https://github.com/mkrd/PathDict/actions/workflows/test.yml/badge.svg)
 
 
 Why do I need this?
