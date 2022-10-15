@@ -1,5 +1,5 @@
 
-![Logo](/artwork/artwork.png?raw=true)
+![Logo](/artwork/logo.png?raw=true)
 
 [![Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
 [![Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
