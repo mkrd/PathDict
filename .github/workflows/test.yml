@@ -35,6 +35,14 @@ jobs:
       - name: Run tests with code coverage report
         run: poetry run pytest --cov=pathdict test_all.py --cov-report term-missing
 
+      #----------------------------------------------
+      #---- Save coverage artifact
+      #----------------------------------------------
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: .coverage
+
 
 
   # JOB
@@ -45,6 +53,11 @@ jobs:
       #----------------------------------------------
       #---- Coverage badge
       #----------------------------------------------
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage
+
+
       - name: Coverage Badge
         uses: tj-actions/coverage-badge-py@v1.8
 
