@@ -39,9 +39,9 @@ users = PathDict(users)
 # Get all user names
 users["*", "name"]  # -> ["Julia", "Ben"]
 
-# Add new post to Julia's posts
+# Add new post to the current_user's posts
 new_post = {"title": ...}
-users["u2", posts] = lambda x: (x or []) + [new_post]  # Key "posts" is automatically created!
+users[current_user.id, "posts"] = lambda x: (x or []) + [new_post]  # Key "posts" is automatically created!
 
 
 # Increase age of Julia
