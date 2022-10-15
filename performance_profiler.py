@@ -1,7 +1,7 @@
 import cProfile
 import pstats
 import json
-from path_dict import PathDict
+from pathdict import PathDict
 import os
 
 db_directory = "./test_data/production_database"

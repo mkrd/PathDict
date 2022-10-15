@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "path_dict"
+name = "pathdict"
 version = "1.2.6"
 repository = "https://github.com/mkrd/PathDict"
 description = "Better dict for Python!"

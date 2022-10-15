@@ -72,7 +72,7 @@ Installation
 `pip3 install path-dict`
 
 ```python
-from path_dict import PathDict
+from pathdict import PathDict
 ```
 
 Usage
@@ -237,5 +237,5 @@ friend_ages = joe.aggregate("friends", init=0, f=lambda k, v, a: a + v["age"])
 
 ## Serialize to JSON
 
-To serialize a PathDict to JSON, call `json.dumps(path_dict.dict)`.
+To serialize a PathDict to JSON, call `json.dumps(<PathDict>.dict)`.
 If you try to serialize a PathDict object itself, the operation will fail.

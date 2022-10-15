@@ -31,4 +31,4 @@ jobs:
       #----------------------------------------------
 
       - name: Run tests with code coverage report
-        run: poetry run pytest --cov=path_dict test_all.py --cov-report term-missing
+        run: poetry run pytest --cov=pathdict test_all.py --cov-report term-missing
