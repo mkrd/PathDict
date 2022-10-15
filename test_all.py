@@ -112,6 +112,15 @@ def test_initialization():
 	assert dc_pd is not dc_pd_deepcopy
 
 
+def test_pop():
+	pd = PathDict({"u1": "Ben", "u2": "Sue"})
+	popped = pd.pop("u1")
+	assert popped == "Ben"
+	assert pd.dict == {"u2": "Sue"}
+	pop_not_existent = pd.pop("u3", None)
+	assert pop_not_existent is None
+
+
 def test_list_gets():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
@@ -138,6 +147,23 @@ def test_get_path():
 	# Wrong path accesses, eg. get key on list, raise an exception
 	with pytest.raises(KeyError):
 		users_pd["follows", 0]
+
+
+def test_set_path():
+	pd = PathDict({"u1": "Ben", "u2": "Sue"})
+	pd.set_path("Not a list", "test")
+	pd.set_path(["u1"], None)
+	assert pd.dict == {"u1": "Ben", "u2": "Sue"}
+
+	pd.set_path([], {"u3": "Joe"})
+	assert pd.dict == {"u3": "Joe"}
+
+	pd = PathDict({"l1": [1, 2, 3]})
+	with pytest.raises(KeyError):
+		pd.set_path(["l1", "nonexistent"], 4)
+	with pytest.raises(KeyError):
+		pd.set_path(["l1", "nonexistent", "also_nonexistent"], 4)
+
 
 
 def test_filter():
@@ -179,6 +205,10 @@ def test_aggregate():
 	users_pd = PathDict(users, deep_copy=True)
 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
 	assert users_ages == 103
+
+	pd = PathDict({"l1": [1, 2, 3]})
+	with pytest.raises(LookupError):
+		pd.aggregate("l1", init=0, f=lambda k, v, a: a + v)
 
 
 def test_PathDict():

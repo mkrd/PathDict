@@ -198,6 +198,8 @@ class PathDict(UserDict):
 				raise KeyError("Can't set the key of a non-dict")
 			current.setdefault(key, {})
 			current = current[key]
+		if not isinstance(current, dict):
+			raise KeyError("Can't set the key of a non-dict")
 		if isinstance(value, PathDict):
 			current[last_path_key] = value.data
 		else:
