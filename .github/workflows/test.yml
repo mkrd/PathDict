@@ -50,9 +50,12 @@ jobs:
     needs: test-cov
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       #----------------------------------------------
       #---- Coverage badge
       #----------------------------------------------
+      - name: ls-lah
+        run: ls -lah
       - uses: actions/download-artifact@v3
         with:
           name: coverage
