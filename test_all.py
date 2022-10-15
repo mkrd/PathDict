@@ -1,41 +1,8 @@
+from importlib.resources import path
+from typing import Type
 from path_dict import PathDict
-from typing import Callable
 import copy
-import time
-import traceback
-
-
-
-def colored_str_by_color_code(s, color_code):
-	res = "\033["
-	res += f"{color_code}m{s}"
-	res += "\033[0m"
-	return res
-
-
-
-class test:
-	""" A decorator that runs tests automatically and provides teardown and setup """
-	def __init__(self, setup: Callable = lambda: None, teardown: Callable = lambda: None):
-		self.setup = setup
-		self.teardown = teardown
-
-	def __call__(self, method):
-		self.setup()
-		try:
-			t1 = time.time()
-			method()
-			t2 = time.time()
-			ms = f"{((t2 - t1) * 1000):.1f}ms"
-			print(colored_str_by_color_code(f"Test {method.__name__}() finished in {ms}", 92))
-		except AssertionError:
-			print(colored_str_by_color_code(f"Test {method.__name__}() failed!", 91))
-			print(colored_str_by_color_code(traceback.format_exc(), 91))
-			raise
-		except BaseException:
-			raise
-		finally:
-			self.teardown()
+import pytest
 
 
 
@@ -64,7 +31,7 @@ users = {
 	]
 }
 
-@test()
+
 def test_deepcopy():
 	# Test deepcopy with object
 	class TestObject():
@@ -86,8 +53,7 @@ def test_deepcopy():
 		raise AssertionError("pd.deepcopy failed")
 
 
-@test()
-def referencing():
+def test_referencing():
 	p_table = {
 		"p1": PathDict(),
 		"p2": PathDict(),
@@ -96,9 +62,8 @@ def referencing():
 	}
 	for a in p_table:
 		for b in p_table:
-			if a == b:
-				continue
-			assert p_table[a].data is not p_table[b].data
+			if a != b:
+				assert p_table[a].data is not p_table[b].data
 
 	shared_d1 = {}
 	p1_with_shared_d1 = PathDict(shared_d1)
@@ -114,21 +79,17 @@ def referencing():
 	assert p3_with_shared_d1.data is p1_with_shared_d1.data
 
 
-@test()
-def initialization():
+def test_initialization():
 	# Pre-checks
-	assert isinstance(None, PathDict) == False
+	assert not isinstance(None, PathDict)
 	assert PathDict().data == {}
 	# Empty
 	pd_empty = PathDict({})
 	assert pd_empty.dict == {}
 	# Wrong inits
-	for wrong in ["", None, 1, [1]]:
-		try:
-			_ = PathDict(wrong)
-			assert False
-		except Exception:
-			assert True
+	for wrong in ["", 1, [1]]:
+		with pytest.raises(TypeError):
+			PathDict(wrong)
 	# Init with PathDict
 	init_pd = PathDict({"test": 1})
 	pd_from_pd = PathDict(init_pd)
@@ -151,15 +112,21 @@ def initialization():
 	assert dc_pd is not dc_pd_deepcopy
 
 
+def test_pop():
+	pd = PathDict({"u1": "Ben", "u2": "Sue"})
+	popped = pd.pop("u1")
+	assert popped == "Ben"
+	assert pd.dict == {"u2": "Sue"}
+	pop_not_existent = pd.pop("u3", None)
+	assert pop_not_existent is None
 
-@test()
+
 def test_list_gets():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
-
 	assert users_pd[["users", "2", "age"]] == 49
 
-@test()
+
 def test_get_path():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
@@ -167,20 +134,38 @@ def test_get_path():
 	assert users_pd["users", "1", "name"] == "Joe"
 	# Non existent but correct paths return None
 	assert users_pd["users", "-1", "name"] is None
+	# Non path returns None
+	with pytest.raises(TypeError):
+		users_pd.get_path(2)
+
+	assert users_pd[2] is None
 	# If value is not a dict, return that value
 	assert isinstance(users_pd["follows"], list)
 	# If value is a dict, return a PathDict
 	assert isinstance(users_pd["users"], PathDict)
 	assert users_pd["users"].dict is users_dict["users"]
 	# Wrong path accesses, eg. get key on list, raise an exception
-	try:
-		_ = users_pd["follows", 0]
-		assert False
-	except BaseException:
-		assert True
+	with pytest.raises(KeyError):
+		users_pd["follows", 0]
 
 
-@test()
+def test_set_path():
+	pd = PathDict({"u1": "Ben", "u2": "Sue"})
+	pd.set_path("Not a list", "test")
+	pd.set_path(["u1"], None)
+	assert pd.dict == {"u1": "Ben", "u2": "Sue"}
+
+	pd.set_path([], {"u3": "Joe"})
+	assert pd.dict == {"u3": "Joe"}
+
+	pd = PathDict({"l1": [1, 2, 3]})
+	with pytest.raises(KeyError):
+		pd.set_path(["l1", "nonexistent"], 4)
+	with pytest.raises(KeyError):
+		pd.set_path(["l1", "nonexistent", "also_nonexistent"], 4)
+
+
+
 def test_filter():
 	users_pd = PathDict(users, deep_copy=True)
 
@@ -216,13 +201,16 @@ def test_filter():
 
 
 
-@test()
 def test_aggregate():
 	users_pd = PathDict(users, deep_copy=True)
 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
 	assert users_ages == 103
 
-@test()
+	pd = PathDict({"l1": [1, 2, 3]})
+	with pytest.raises(LookupError):
+		pd.aggregate("l1", init=0, f=lambda k, v, a: a + v)
+
+
 def test_PathDict():
 	d = {
 		"total_users": 3,
@@ -282,10 +270,6 @@ def test_PathDict():
 	}
 
 
-
-
-
-@test()
 def test_star_operations():
 	winners_original = PathDict({
 		"2017": {
@@ -306,7 +290,13 @@ def test_star_operations():
 		},
 	})
 
-	# assert winners == winners["*"]
+
+	# Get names of all winners
+	winners = winners_original.deepcopy
+	assert winners["*", "podium", "*", "name"] == [
+		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
+	]
+
 
 
 	# Increment age of all users by 1
@@ -322,28 +312,99 @@ def test_star_operations():
 	# winners = winners_original.deepcopy
 	# winners["*", "podium", "*"] = lambda x: x["age"] += 1 if "B" in x["name"] else x["age"] == 0
 
-
-
-
 	# print("GO")
 	# assert AssertionError()
 	# print(winners)
-
 
 	# names_2017 = winners["2017", "podium", "*", "name"]
 	# print(names_2017)
 	# assert names_2017 == ["Joe", "Ben", "Sue"]
 
-@test()
+
 def test_contains():
 	users_dict = copy.deepcopy(users)
 	users_pd = PathDict(users_dict)
-	assert ("" in users_pd) == False
-	assert ("total_users" in users_pd) == True
-	assert (["premium_users", 1] in users_pd) == False
-	assert (["users","1"] in users_pd) == True
-	assert (["users","999999"] in users_pd) == False
-	assert (["users","1","name"] in users_pd) == True
-	assert (["users","999999","name"] in users_pd) == False
-	assert (["users","1","name","joe"] in users_pd) == False
-	assert (["users","1","name","joe","Brown"] in users_pd) == False # too many paths
+	assert "" not in users_pd
+	assert "total_users" in users_pd
+	assert ["premium_users", 1] not in users_pd
+	assert ["users", "1"] in users_pd
+	assert ["users", "999999"] not in users_pd
+	assert ["users", "1", "name"] in users_pd
+	assert ["users", "999999", "name"] not in users_pd
+	assert ["users", "1", "name", "joe"] not in users_pd
+	assert ["users", "1", "name", "joe", "Brown"] not in users_pd  # too many paths
+
+
+
+
+def test_basic_star_path():
+	db = {
+		"a": {
+			"a1": 1,
+			"a2": 2,
+			"a3": 3,
+		},
+		"b": {
+			"b1": 4,
+			"b2": 5,
+			"b3": 6,
+		},
+	}
+
+	pd = PathDict(db)
+
+	# Finds all values, returns as list
+	assert pd["*"] == [
+		{
+			"a1": 1,
+			"a2": 2,
+			"a3": 3,
+		},
+		{
+			"b1": 4,
+			"b2": 5,
+			"b3": 6,
+		},
+	]
+
+	print(pd["*", "a1"])
+	assert pd["*", "a1"] == [1, None]
+	assert pd["*", "*"] == [1, 2, 3, 4, 5, 6]
+
+
+
+def test_basic_star_path_2():
+	pd = PathDict({
+		"1": {
+			"name": "Joe",
+			"age": 22,
+			"interests": ["Python", "C++", "C#"],
+		},
+		"2": {
+			"name": "Ben",
+			"age": 49,
+			"interests": ["Javascript", "C++", "Haskell"],
+		},
+		"3": {
+			"name": "Sue",
+			"age": 36,
+			"interests": ["Python", "C++", "C#"],
+		},
+	})
+
+	ages = pd["*", "age"]
+	assert ages == [22, 49, 36]
+
+	ages_sum = sum(pd["*", "age"])
+	assert ages_sum == 107
+
+	# ages_over_30 = pd.filtered("*", "age", f=lambda x: x > 30)
+	# print(ages_over_30)
+	# assert ages_over_30 == [49, 36]
+
+	interests = pd["*", "interests"]
+	assert interests == [
+		["Python", "C++", "C#"],
+		["Javascript", "C++", "Haskell"],
+		["Python", "C++", "C#"],
+	]

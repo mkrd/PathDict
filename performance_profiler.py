@@ -15,8 +15,8 @@ class TestObject(object):
 		print(path)
 
 
-users = PathDict(json.loads(open(db_directory + "/users.json", "r").read()))
-tasks = PathDict(json.loads(open(db_directory + "/tasks.json", "r").read()))
+users = PathDict(json.loads(open(f"{db_directory}/users.json", "r").read()))
+tasks = PathDict(json.loads(open(f"{db_directory}/tasks.json", "r").read()))
 users.filter(f=lambda k, v: v.get("status") != "archived")
 sorted_users_list = sorted(users.dict.values(), key=lambda x: x["first_name"])
 
