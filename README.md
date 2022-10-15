@@ -4,7 +4,8 @@
 [![Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
 [![Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
 [![Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
-![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+![example workflow](https://github.com/mkrd/PathDict/actions/workflows/test/badge.svg
+)
 
 
 Why do I need this?
