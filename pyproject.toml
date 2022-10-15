@@ -22,6 +22,9 @@ python = "^3.8"
 pycodestyle = "^2.8.0"
 pytest-cov = "^3.0.0"
 
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
