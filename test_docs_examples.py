@@ -1,4 +1,4 @@
-from pathdict import PathDict
+from path_dict import PathDict
 
 users = {
 	"u1": {

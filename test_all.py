@@ -1,6 +1,6 @@
 from importlib.resources import path
 from typing import Type
-from pathdict import PathDict
+from path_dict import PathDict
 import copy
 import pytest
 

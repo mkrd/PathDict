@@ -2,7 +2,7 @@
 name = "path_dict"
 version = "2.0.0"
 repository = "https://github.com/mkrd/PathDict"
-description = "Better dict for Python!"
+description = "Extends Python's dict with useful extras"
 authors = ["Marcel Kröker <kroeker.marcel@gmail.com>"]
 license = "MIT"
 readme = "README.md"
@@ -16,7 +16,7 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 pycodestyle = "^2.8.0"
