@@ -11,10 +11,56 @@
 Why do I need this?
 ================================================================================
 
-Do you also hate to write nested checks to access a nested value in a dict?
-Then PathDict is right for you!
+Do you work with dicts a lot, but you also whish that they could to more?
+Then PathDict is for you!
 
-Example: Lets consider the following dict filled with users. Notice how Bob has
+Lets look at this dict:
+
+```python
+users = {
+    "u1": {
+		"name": "Julia",
+		"age": 32,
+        "interests": ["soccer", "basketball"],
+    },
+    "u2": {
+		"name": "Ben",
+		"age": 26,
+        "interests": ["pop", "alternative"]
+    }
+}
+```
+
+With PathDict, you can do things like:
+
+```python
+users = PathDict(users)
+
+# Get all user names
+users["*", "name"]  # -> ["Julia", "Ben"]
+
+# Increase age of Julia
+users["u1", "age"] = 33
+
+# Append interest "cooking" to all users
+users["*", "interests"] = lambda interests: interests + ["cooking"]
+
+
+# Remove all interests of Ben which do not start with "a" ("cooking is removed")
+users.filter("u2", "interests", f=lambda interest: not interest.startswith("a"))
+
+# Remove users that are younger than 30
+users.filter(f=lambda id, user: user["age"] >= 30)
+```
+
+**Pretty neat, right?**
+
+
+
+Second Example
+--------------------------------------------------------------------------------
+
+Consider the following dict filled with users. Notice how Bob has
 provided sports interests only, and Julia has provided music interests only.
 ```python
 db = {
@@ -31,7 +77,7 @@ db = {
 }
 ```
 
-Lets print the music interests of each user:
+Lets print the music interests of each user using normal dicts:
 
 ```python
 for user_name in db:
