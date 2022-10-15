@@ -258,7 +258,7 @@ A filtered function is also offered, which does the same, but returns a filtered
 joe = PathDict(user, deepcopy=True)
 
 # Remove all friends that are older than 33.
-joe.filter("friends", f=lambda k, v: v["age"] < 33)
+joe.filter("friends", f=lambda k, v: v["age"] <= 33)
 
 > joe["friends"]
 ---> PathDict({
