@@ -140,17 +140,24 @@ class PathDict(UserDict):
 		# Iterate over the path to safely get the value
 		current = self.data
 		for key in path:
-			if not isinstance(current, dict):
+			if isinstance(current, list):
+				if not isinstance(key, int):
+					raise KeyError("PathDict.get_path: key must be an int for lists")
+				if key >= len(current):
+					raise IndexError("PathDict.get_path: list key out of range")
+				current = current[key]
+
+			elif not isinstance(current, dict):
 				raise KeyError(
 					f"The path {path} is not a stack of nested "
 					f"dicts (value at key {key} has type {type(current)})"
 				)
-			if key not in current:
-				return None
-			current = current[key]
-		if isinstance(current, dict):
-			return PathDict(current)
-		return current
+			else:
+				if key not in current:
+					return None
+				current = current[key]
+
+		return PathDict(current) if isinstance(current, dict) else current
 
 
 	def __getitem__(self, path) -> Any | PathDict | list:

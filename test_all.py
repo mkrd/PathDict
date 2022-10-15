@@ -46,11 +46,9 @@ def test_deepcopy():
 
 	assert str(pd) == """PathDict({\n    "test": {\n        "test": "TestObject({'test': 'test'})"\n    }\n})"""
 
-	try:
-		pd_deepcopy = pd.deepcopy
-		assert str(pd) == str(pd_deepcopy)
-	except Exception:
-		raise AssertionError("pd.deepcopy failed")
+	pd_deepcopy = pd.deepcopy
+	assert str(pd) == str(pd_deepcopy)
+
 
 
 def test_referencing():
@@ -146,7 +144,8 @@ def test_get_path():
 	assert users_pd["users"].dict is users_dict["users"]
 	# Wrong path accesses, eg. get key on list, raise an exception
 	with pytest.raises(KeyError):
-		users_pd["follows", 0]
+		print(users_pd["follows", "not_correct"])
+
 
 
 def test_set_path():
@@ -418,3 +417,26 @@ def test_basic_star_path_2():
 		["Javascript", "C++", "Haskell"],
 		["Python", "C++", "C#"],
 	]
+
+
+def test_scenario_1():
+	tr = PathDict({
+		"1": {
+			"date": "2018-01-01",
+			"amount": 100,
+			"currency": "EUR",
+		},
+		"2": {
+			"date": "2018-01-02",
+			"amount": 200,
+			"currency": "CHF",
+			"related": [5, {"nested": "val"}, 2, 3]
+		},
+	})
+
+	assert tr["2", "related", 1, "nested"] == "val"
+
+	with pytest.raises(IndexError):
+		print(tr["2", "related", 9])
+	with pytest.raises(KeyError):
+		print(tr["2", "related", 0, "nested", "val"])
