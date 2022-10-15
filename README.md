@@ -26,7 +26,7 @@ users = {
     "u2": {
         "name": "Ben",
         "age": 26,
-        "interests": ["airplanes", "alternative music"]
+        "interests": ["airplanes", "alternative music"],
     }
 }
 ```
@@ -38,6 +38,11 @@ users = PathDict(users)
 
 # Get all user names
 users["*", "name"]  # -> ["Julia", "Ben"]
+
+# Add new post to Julia's posts
+new_post = {"title": ...}
+users["u2", posts] = lambda x: (x or []) + [new_post]  # Key "posts" is automatically created!
+
 
 # Increase age of Julia
 users["u1", "age"] = 33
