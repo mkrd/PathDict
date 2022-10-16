@@ -268,7 +268,7 @@ class PathDict(UserDict):
 
 			self[path_list] = filtered
 		elif isinstance(path_val, list):
-			self[path_list] = [x for x in list(path_val) if f(x)]
+			self[path_list] = [x for x in list(path_val) if f(PathDict(x) if isinstance(x, dict) else x)]
 
 
 	def filtered(self, *path, f: Callable = None):
