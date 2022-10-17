@@ -1,9 +1,6 @@
-from importlib.resources import path
-from typing import Type
 from path_dict import PathDict
 import copy
 import pytest
-
 
 
 # Dict for testing purposes
@@ -32,54 +29,14 @@ users = {
 }
 
 
-def test_deepcopy():
-	# Test deepcopy with object
-	class TestObject():
-		def __init__(self, data):
-			self.data = data
-
-		def __repr__(self):
-			return f"TestObject({self.data})"
-
-	pd = PathDict({})
-	pd["test", "test"] = TestObject({"test": "test"})
-
-	assert str(pd) == """PathDict({\n    "test": {\n        "test": "TestObject({'test': 'test'})"\n    }\n})"""
-
-	pd_deepcopy = pd.deepcopy
-	assert str(pd) == str(pd_deepcopy)
 
 
 
-def test_referencing():
-	p_table = {
-		"p1": PathDict(),
-		"p2": PathDict(),
-		"p3": PathDict({}),
-		"p4": PathDict({}),
-	}
-	for a in p_table:
-		for b in p_table:
-			if a != b:
-				assert p_table[a].data is not p_table[b].data
 
-	shared_d1 = {}
-	p1_with_shared_d1 = PathDict(shared_d1)
-	p2_with_shared_d1 = PathDict(shared_d1)
-	assert p1_with_shared_d1.data is p2_with_shared_d1.data
-
-	p_with_deep_copy_d1 = PathDict(shared_d1, deep_copy=True)
-	p3_with_shared_d1 = PathDict(shared_d1)
-
-	# Deep copy should have its own value
-	assert p_with_deep_copy_d1.data is not p1_with_shared_d1.data
-	# Ensure deep_copy is set to False again
-	assert p3_with_shared_d1.data is p1_with_shared_d1.data
 
 
 def test_initialization():
 	# Pre-checks
-	assert not isinstance(None, PathDict)
 	assert PathDict().data == {}
 	# Empty
 	pd_empty = PathDict({})
@@ -147,7 +104,6 @@ def test_get_path():
 		print(users_pd["follows", "not_correct"])
 
 
-
 def test_set_path():
 	pd = PathDict({"u1": "Ben", "u2": "Sue"})
 	pd.set_path("Not a list", "test")
@@ -162,7 +118,6 @@ def test_set_path():
 		pd.set_path(["l1", "nonexistent"], 4)
 	with pytest.raises(KeyError):
 		pd.set_path(["l1", "nonexistent", "also_nonexistent"], 4)
-
 
 
 def test_filter():
@@ -209,7 +164,6 @@ def test_filter():
 	]
 
 
-
 def test_aggregate():
 	users_pd = PathDict(users, deep_copy=True)
 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
@@ -218,65 +172,6 @@ def test_aggregate():
 	pd = PathDict({"l1": [1, 2, 3]})
 	with pytest.raises(LookupError):
 		pd.aggregate("l1", init=0, f=lambda k, v, a: a + v)
-
-
-def test_PathDict():
-	d = {
-		"total_users": 3,
-		"premium_users": [1, 3],
-		"users": {
-			"1": {"name": "Joe", "age": 22},
-			"2": {"name": "Ben", "age": 49},
-			"3": {"name": "Sue", "age": 32},
-		},
-		"follows": [
-			["Ben", "Sue"],
-			["Joe", "Ben"],
-			["Ben", "Joe"],
-		]
-	}
-	o = PathDict(d)
-	# Getting attributes
-	assert o["total_users"] == 3
-	assert o["not_exists"] is None
-	assert o["users"] == {
-		"1": {"name": "Joe", "age": 22},
-		"2": {"name": "Ben", "age": 49},
-		"3": {"name": "Sue", "age": 32}}
-	assert o["users", "1"] == {"name": "Joe", "age": 22}
-	assert o["users", "3", "name"] == "Sue"
-	assert o["follows"][0] == ["Ben", "Sue"]
-	# Setting attributes
-	o["total_users"] = 4
-	assert o["total_users"] == 4
-	o["users", "3", "age"] = 99
-	assert o["users", "3", "age"] == 99
-	o["users", "4"] = {"name": "Ron", "age": 62}
-	assert o["users", "4"] == {"name": "Ron", "age": 62}
-	o["1", "1", "1", "1"] = 1
-	assert o["1", "1", "1"] == {"1": 1}
-	# Apply functions
-	o["follows"] = lambda x: [list(reversed(e)) for e in x]
-	assert o["follows"] == [
-		["Sue", "Ben"],
-		["Ben", "Joe"],
-		["Joe", "Ben"]]
-
-	assert o.dict == {
-		"1": {"1": {"1": {"1": 1}}},
-		"total_users": 4,
-		"premium_users": [1, 3],
-		"users": {
-			"1": {"name": "Joe", "age": 22},
-			"2": {"name": "Ben", "age": 49},
-			"3": {"name": "Sue", "age": 99},
-			"4": {"name": "Ron", "age": 62},
-		},
-		"follows": [
-			["Sue", "Ben"],
-			["Ben", "Joe"],
-			["Joe", "Ben"]]
-	}
 
 
 def test_star_operations():
@@ -344,8 +239,6 @@ def test_contains():
 	assert ["users", "1", "name", "joe", "Brown"] not in users_pd  # too many paths
 
 
-
-
 def test_basic_star_path():
 	db = {
 		"a": {
@@ -379,7 +272,6 @@ def test_basic_star_path():
 	print(pd["*", "a1"])
 	assert pd["*", "a1"] == [1, None]
 	assert pd["*", "*"] == [1, 2, 3, 4, 5, 6]
-
 
 
 def test_basic_star_path_2():
@@ -419,7 +311,7 @@ def test_basic_star_path_2():
 	]
 
 
-def test_scenario_1():
+def test_scenario_2():
 	tr = PathDict({
 		"1": {
 			"date": "2018-01-01",
