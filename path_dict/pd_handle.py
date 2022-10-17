@@ -165,6 +165,7 @@ class PDHandle:
 
 
 	def set(self, value) -> PDHandle:
+		# Setting nothing is a no-op
 		if value is None:
 			return self
 
@@ -185,15 +186,9 @@ class PDHandle:
 		for key in self.path_handle[:-1]:
 			current = utils.guarded_descent(current, key)
 
-		if not isinstance(current, (dict, list)):
-			raise KeyError("PathDict set: Only dicts and lists can be set")
-
 		key = self.path_handle[-1]
 		if isinstance(current, dict):
-			try:
-				current[key] = value
-			except (ValueError, IndexError) as e:
-				raise KeyError(f"PDHandle.set: invalid path {self.path_handle}") from e
+			current[key] = value
 		elif isinstance(current, list):
 			try:
 				current[int(key)] = value
@@ -252,10 +247,9 @@ class PDHandle:
 		return copy
 
 
-
-	# def aggregate(self, *path, init=None, f: Callable = None):
+	# def reduce(self, *path, init=None, f: Callable = None):
 	# 	"""
-	# 		Aggregate a value starting with init at the given path.
+	# 		Reduce a value starting with init at the given path.
 	# 		f takes 3 arguments: key, values, and agg (initialized with init).
 	# 	"""
 	# 	path_val = self[path]
@@ -267,10 +261,10 @@ class PDHandle:
 	# 	return agg
 
 
-
 	############################################################################
 	#### Standard dict methods
 	############################################################################
+
 
 	# def keys(self):
 	# 	return self.data.keys()
@@ -289,10 +283,6 @@ class PDHandle:
 
 
 	def __repr__(self) -> str:
-		"""
-			Returns a pretty indented string representation.
-		"""
-
 		return f"PDHandle({self.data = }, {self.root_data = }, {self.path_handle = })"
 
 
@@ -307,6 +297,7 @@ class PDHandle:
 		at = self.at(*path) if isinstance(path, tuple) else self.at(path)
 		at.map(value) if callable(value) else at.set(value)
 		self.at_root()
+
 
 	def __contains__(self, *path):
 		try:

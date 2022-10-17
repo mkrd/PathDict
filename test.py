@@ -98,6 +98,15 @@ def test_at():
 	assert pd(db).at(["users/1", "friends"]).path_handle.path == ["users", "1", "friends"]
 
 
+def test_at_parent():
+	assert pd(db).at("users/1").at_parent().path_handle.path == ["users"]
+	pd(db).at_parent().get() is None
+
+
+def test_at_children():
+	assert pd(db).at("users").at_children().get_all() == [u for u in db["users"].values()]
+
+
 def test_simple_get():
 	assert pd(db).get() == db
 	assert pd(db).at("").get() == db
@@ -151,16 +160,35 @@ def test_get_path():
 	assert users_pd[["follows", 0]] == ["Ben", "Sue"]
 
 
+def test_PDHandle_get_at():
+	j = {"1": {"2": 3}}
+	pd(j).get_at("1/2") == 3
+	pd(j).get_at("1/3/4") is None
+	pd(j).get_at("2") is None
+	with pytest.raises(KeyError):
+		pd(j).get_at("1/2/3")
+
+
 def test_set_path():
+	assert pd(["1", 2]).set([3, "4"]).get() == [3, "4"]
+
 	j = {"u1": "Ben", "u2": "Sue"}
 	p = pd(j)
 
+	p.set(None).get() == j
 
-
+	# Replace entire dict
 	p.at().set({"u3": "Joe"})
 	assert j == {"u3": "Joe"}
 
-	assert pd(["1", 2]).set([3, "4"]).get() == [3, "4"]
+	# Cover specific KeyError
+	with pytest.raises(KeyError):
+		p.at("u3/meta/age").set(22)
+
+	with pytest.raises(TypeError):
+		p.at().set("Not Allowed")
+
+
 
 	p = pd({"l1": [1, 2, 3]})
 	with pytest.raises(KeyError):
@@ -343,6 +371,10 @@ def test_PDMultiHandle_get_all():
 
 	p = pd(db)
 
+	assert p.at("nonexistent/*").get_all() == []
+	assert p.at("*/nonexistent/*").get_all() == []
+	# assert p.at("*/nonexistent").get_all() == []
+
 	# Finds all values, returns as list
 	assert p.at("*").get_all() == [
 		{
@@ -423,6 +455,14 @@ def test_PDMultiHandle_get_all_2():
 
 
 
+def test_PDMultiHandle_get_all_3():
+	p = pd({
+		"1": [2, 3, 4],
+		"2": "3",
+	})
+	assert p.at("1/*").get_all() == [2, 3, 4]
+	with pytest.raises(KeyError):
+		p.at("2/*").get_all()
 
 
 def test_PDHandle_filter():
@@ -468,13 +508,79 @@ def test_PDHandle_filter_behavior_spec():
 	p = pd(j)
 	p.at("1").filter(lambda k, v: int(k) > 3)
 
-
 	assert j == {"a": "b", "1": {"4": "40"}}
 	assert p.get() == {"4": "40"}
 	assert p.get_root() == {"a": "b", "1": {"4": "40"}}
 
+	with pytest.raises(TypeError):
+		p.at("a").filter(lambda x: x)
 
-# def test_aggregate():
+
+def test_scenario_2():
+	tr = pd({
+		"1": {
+			"date": "2018-01-01",
+			"amount": 100,
+			"currency": "EUR",
+		},
+		"2": {
+			"date": "2018-01-02",
+			"amount": 200,
+			"currency": "CHF",
+			"related": [5, {"nested": "val"}, 2, 3]
+		},
+	})
+
+	assert tr["2", "related", 1, "nested"] == "val"
+
+	with pytest.raises(KeyError):
+		print(tr["2", "related", 9])
+	with pytest.raises(KeyError):
+		print(tr["2", "related", 0, "nested", "val"])
+
+
+def test_star_operations():
+	winners_original = pd({
+		"2017": {
+			"podium": {
+				"17-place-1": {"name": "Joe", "age": 22},
+				"17-place-2": {"name": "Ben", "age": 13},
+				"17-place-3": {"name": "Sue", "age": 98},
+			},
+			"prices_list": ["Car", "Bike", "Plane"],
+		},
+		"2018": {
+			"podium": {
+				"18-place-1": {"name": "Bernd", "age": 50},
+				"18-place-2": {"name": "Sara", "age": 32},
+				"18-place-3": {"name": "Jan", "age": 26},
+			},
+			"prices_list": ["Beer", "Coffee", "Cigarette"],
+		},
+	})
+
+	# Get names of all winners
+	winners = winners_original.copy(at_root=True)
+	assert winners.at("*", "podium", "*", "name").get_all() == [
+		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
+	]
+
+	# Increment age of all users by 1
+	winners = winners_original.copy(at_root=True)
+	winners.at("*/podium/*/age").map(lambda x: x + 1)
+	assert winners["2017", "podium", "17-place-1", "age"] == 23
+	assert winners["2017", "podium", "17-place-2", "age"] == 14
+	assert winners["2017", "podium", "17-place-3", "age"] == 99
+	assert winners["2018", "podium", "18-place-1", "age"] == 51
+	assert winners["2018", "podium", "18-place-2", "age"] == 33
+	assert winners["2018", "podium", "18-place-3", "age"] == 27
+
+	names_2017 = winners.at("2017", "podium", "*", "name").get_all()
+	assert names_2017 == ["Joe", "Ben", "Sue"]
+
+
+
+# def test_reduce():
 # 	users_pd = PathDict(users, deep_copy=True)
 # 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
 # 	assert users_ages == 103
@@ -482,79 +588,3 @@ def test_PDHandle_filter_behavior_spec():
 # 	pd = PathDict({"l1": [1, 2, 3]})
 # 	with pytest.raises(LookupError):
 # 		pd.aggregate("l1", init=0, f=lambda k, v, a: a + v)
-
-
-# def test_star_operations():
-# 	winners_original = PathDict({
-# 		"2017": {
-# 			"podium": {
-# 				"17-place-1": {"name": "Joe", "age": 22},
-# 				"17-place-2": {"name": "Ben", "age": 13},
-# 				"17-place-3": {"name": "Sue", "age": 98},
-# 			},
-# 			"prices_list": ["Car", "Bike", "Plane"],
-# 		},
-# 		"2018": {
-# 			"podium": {
-# 				"18-place-1": {"name": "Bernd", "age": 50},
-# 				"18-place-2": {"name": "Sara", "age": 32},
-# 				"18-place-3": {"name": "Jan", "age": 26},
-# 			},
-# 			"prices_list": ["Beer", "Coffee", "Cigarette"],
-# 		},
-# 	})
-
-
-# 	# Get names of all winners
-# 	winners = winners_original.copy
-# 	assert winners["*", "podium", "*", "name"] == [
-# 		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
-# 	]
-
-
-
-# 	# Increment age of all users by 1
-# 	winners = winners_original.copy
-# 	winners["*", "podium", "*", "age"] = lambda x: x + 1
-# 	assert winners["2017", "podium", "17-place-1", "age"] == 23
-# 	assert winners["2017", "podium", "17-place-2", "age"] == 14
-# 	assert winners["2017", "podium", "17-place-3", "age"] == 99
-# 	assert winners["2018", "podium", "18-place-1", "age"] == 51
-# 	assert winners["2018", "podium", "18-place-2", "age"] == 33
-# 	assert winners["2018", "podium", "18-place-3", "age"] == 27
-
-# 	# winners = winners_original.copy
-# 	# winners["*", "podium", "*"] = lambda x: x["age"] += 1 if "B" in x["name"] else x["age"] == 0
-
-# 	# print("GO")
-# 	# assert AssertionError()
-# 	# print(winners)
-
-# 	# names_2017 = winners["2017", "podium", "*", "name"]
-# 	# print(names_2017)
-# 	# assert names_2017 == ["Joe", "Ben", "Sue"]
-
-
-
-
-# def test_scenario_2():
-# 	tr = PathDict({
-# 		"1": {
-# 			"date": "2018-01-01",
-# 			"amount": 100,
-# 			"currency": "EUR",
-# 		},
-# 		"2": {
-# 			"date": "2018-01-02",
-# 			"amount": 200,
-# 			"currency": "CHF",
-# 			"related": [5, {"nested": "val"}, 2, 3]
-# 		},
-# 	})
-
-# 	assert tr["2", "related", 1, "nested"] == "val"
-
-# 	with pytest.raises(IndexError):
-# 		print(tr["2", "related", 9])
-# 	with pytest.raises(KeyError):
-# 		print(tr["2", "related", 0, "nested", "val"])
