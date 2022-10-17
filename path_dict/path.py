@@ -14,11 +14,6 @@ class Path:
 
 		# path is, whitout exceptions, always a tuple
 
-		if len(path) == 1 and isinstance(path[0], Path):
-			# If path is a single Path object set it as self
-			self.path = path[0].path
-			return
-
 		if len(path) == 1 and isinstance(path[0], list):
 			# If the path is a list, then we are good to go
 			self.path = path[0]
@@ -42,7 +37,7 @@ class Path:
 
 
 	def __repr__(self) -> str:
-		return "Path(path={self.path}, str_sep={self.str_sep}, raw={self.raw})"
+		return f"Path(path={self.path}, str_sep={self.str_sep}, raw={self.raw})"
 
 
 	@property

@@ -1,7 +1,16 @@
 import sys
-from .pd_handle import PDHandle
+from . pd_handle import PDHandle
+from . path import Path
 
-pd = PDHandle
+
+
+
+def pd(data: dict | list, str_sep="/", raw=False) -> PDHandle:
+    """
+    Create a PDHandle object.
+    """
+    path = Path([], str_sep=str_sep, raw=raw)
+    return PDHandle(data, path)
 
 ################################################################################
 # To be used like this:

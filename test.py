@@ -66,7 +66,6 @@ def test_Path():
 	assert path.expand({}) == [path]
 
 
-
 def test_initialization():
 
 	# Empty
@@ -189,9 +188,12 @@ def test_copy():
 
 	assert pd(j).at("1").get() is j["1"]
 	assert pd(j).at("1").copy().get() is not j["1"]
+
+	print("💽")
+	print(pd(j).at("1").copy())
 	assert pd(j).at("1").copy().get()     == j["1"]
 
-	assert pd(j).at("1").copy(at_root=True).get() == j
+	assert pd(j).at("1").copy(at_root=True).get_root() == j
 
 	# Nested
 	dc_pd = pd(users).copy()
@@ -325,7 +327,7 @@ def test_scenario_1():
 	}
 
 
-def test_basic_star_path():
+def test_PDMultiHandle_get_all():
 	db = {
 		"a": {
 			"a1": 1,
@@ -383,6 +385,46 @@ def test_basic_star_path():
 
 
 
+def test_PDMultiHandle_get_all_2():
+	p = pd({
+		"1": {
+			"name": "Joe",
+			"age": 22,
+			"interests": ["Python", "C++", "C#"],
+		},
+		"2": {
+			"name": "Ben",
+			"age": 49,
+			"interests": ["Javascript", "C++", "Haskell"],
+		},
+		"3": {
+			"name": "Sue",
+			"age": 36,
+			"interests": ["Python", "C++", "C#"],
+		},
+	})
+
+	ages = p.at(["*", "age"]).get_all()
+	assert ages == [22, 49, 36]
+
+	ages_sum = sum(p.at("*/age").get_all())
+	assert ages_sum == 107
+
+	# ages_over_30 = p.at("*/age").filtered(lambda x: x > 30)
+	# print(ages_over_30)
+	# assert ages_over_30 == [49, 36]
+
+	# interests = pd["*", "interests"]
+	# assert interests == [
+	# 	["Python", "C++", "C#"],
+	# 	["Javascript", "C++", "Haskell"],
+	# 	["Python", "C++", "C#"],
+	# ]
+
+
+
+
+
 def test_PDHandle_filter():
 	users_pd = pd(users)
 
@@ -393,10 +435,6 @@ def test_PDHandle_filter():
 			"name": "Joe"
 		}
 	}
-
-	print(users_below_30.get())
-	print(users_below_30.get_root())
-	assert False
 
 	premium_users = users_pd.copy().at("users").filtered(lambda k, v: int(k) in users_pd["premium_users"])
 	assert premium_users.get() == {
@@ -411,8 +449,6 @@ def test_PDHandle_filter():
 	}
 
 	follows_includes_joe = users_pd.at("follows").filtered(lambda e: "Joe" in e)
-	print(follows_includes_joe.get())
-	print(follows_includes_joe.get_root())
 	assert isinstance(follows_includes_joe.get(), list)
 	assert follows_includes_joe.get() == [
 		["Joe", "Ben"],
@@ -420,53 +456,22 @@ def test_PDHandle_filter():
 	]
 
 
+def test_PDHandle_filter_behavior_spec():
+	j = {
+		"a": "b",
+		"1": {
+			"2": "20",
+			"3": "30",
+			"4": "40",
+		}
+	}
+	p = pd(j)
+	p.at("1").filter(lambda k, v: int(k) > 3)
 
 
-
-
-
-# def test_filter():
-# 	users_pd = PathDict(users, deep_copy=True)
-
-# 	users_filtered = users_pd.filtered("users", f=lambda k, v: v["age"] <= 30)
-# 	users_filtered_forgot_f = users_pd.filtered("users", (lambda k, v: v["age"] <= 30))
-
-# 	expected = {
-# 		"1": {
-# 			"age": 22,
-# 			"name": "Joe"
-# 		}
-# 	}
-
-# 	# print(users_filtered_forgot_f)
-
-# 	assert users_filtered["users"] == expected
-# 	assert users_filtered_forgot_f["users"] == expected
-
-
-
-# 	assert isinstance(users_filtered, PathDict)
-
-# 	premium_users = users_pd["users"].filtered(f=lambda k, v: int(k) in users_pd["premium_users"])
-# 	assert isinstance(premium_users, PathDict)
-
-# 	assert premium_users == {
-# 		"1": {
-# 			"age": 22,
-# 			"name": "Joe"
-# 		},
-# 		"3": {
-# 			"age": 32,
-# 			"name": "Sue"
-# 		}
-# 	}
-
-# 	follows_includes_joe = users_pd.filtered("follows", f=lambda e: "Joe" in e)
-# 	assert isinstance(follows_includes_joe["follows"], list)
-# 	assert follows_includes_joe["follows"] == [
-# 		["Joe", "Ben"],
-# 		["Ben", "Joe"],
-# 	]
+	assert j == {"a": "b", "1": {"4": "40"}}
+	assert p.get() == {"4": "40"}
+	assert p.get_root() == {"a": "b", "1": {"4": "40"}}
 
 
 # def test_aggregate():
@@ -530,76 +535,6 @@ def test_PDHandle_filter():
 # 	# assert names_2017 == ["Joe", "Ben", "Sue"]
 
 
-# def test_basic_star_path():
-# 	db = {
-# 		"a": {
-# 			"a1": 1,
-# 			"a2": 2,
-# 			"a3": 3,
-# 		},
-# 		"b": {
-# 			"b1": 4,
-# 			"b2": 5,
-# 			"b3": 6,
-# 		},
-# 	}
-
-# 	pd = PathDict(db)
-
-# 	# Finds all values, returns as list
-# 	assert pd["*"] == [
-# 		{
-# 			"a1": 1,
-# 			"a2": 2,
-# 			"a3": 3,
-# 		},
-# 		{
-# 			"b1": 4,
-# 			"b2": 5,
-# 			"b3": 6,
-# 		},
-# 	]
-
-# 	print(pd["*", "a1"])
-# 	assert pd["*", "a1"] == [1, None]
-# 	assert pd["*", "*"] == [1, 2, 3, 4, 5, 6]
-
-
-# def test_basic_star_path_2():
-# 	pd = PathDict({
-# 		"1": {
-# 			"name": "Joe",
-# 			"age": 22,
-# 			"interests": ["Python", "C++", "C#"],
-# 		},
-# 		"2": {
-# 			"name": "Ben",
-# 			"age": 49,
-# 			"interests": ["Javascript", "C++", "Haskell"],
-# 		},
-# 		"3": {
-# 			"name": "Sue",
-# 			"age": 36,
-# 			"interests": ["Python", "C++", "C#"],
-# 		},
-# 	})
-
-# 	ages = pd["*", "age"]
-# 	assert ages == [22, 49, 36]
-
-# 	ages_sum = sum(pd["*", "age"])
-# 	assert ages_sum == 107
-
-# 	# ages_over_30 = pd.filtered("*", "age", f=lambda x: x > 30)
-# 	# print(ages_over_30)
-# 	# assert ages_over_30 == [49, 36]
-
-# 	interests = pd["*", "interests"]
-# 	assert interests == [
-# 		["Python", "C++", "C#"],
-# 		["Javascript", "C++", "Haskell"],
-# 		["Python", "C++", "C#"],
-# 	]
 
 
 # def test_scenario_2():

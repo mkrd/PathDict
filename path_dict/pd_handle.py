@@ -11,7 +11,7 @@ class PDHandle:
 	data:      dict | list | Any
 	path_handle: Path
 
-	def __init__(self, data: dict | list, str_sep="/", raw=False) -> None:
+	def __init__(self, data: dict | list, path: Path) -> None:
 		"""
 		A PDHandle always refers to a dict or list.
 		It is used to get data or perform operations at a given path.
@@ -23,7 +23,7 @@ class PDHandle:
 
 		self.root_data = data  # The original data that was passed to the first PDHandle
 		self.data = data
-		self.path_handle = Path([], str_sep=str_sep, raw=raw)
+		self.path_handle = path
 
 
 	def copy(self, at_root=False) -> PDHandle:
@@ -33,18 +33,11 @@ class PDHandle:
 		:param at_root: If True, copy the root data instead of the current
 		path handle value.
 		"""
-		if at_root:
-			return PDHandle(
-				copy.deepcopy(self.data),
-				str_sep=self.path_handle.str_sep,
-				raw=self.path_handle.raw
-			)
-		else:
-			return PDHandle(
-				copy.deepcopy(self.get()),
-				str_sep=self.path_handle.str_sep,
-				raw=self.path_handle.raw
-			)
+		path = copy.deepcopy(self.path_handle)
+		copied_data = copy.deepcopy(self.data if at_root else self.get())
+		if not at_root:
+			path.path = []
+		return PDHandle(copied_data, path)
 
 
 	############################################################################
@@ -239,13 +232,13 @@ class PDHandle:
 		At the current path only keep the elements for which f(key, value)
 		is True for dicts, or f(value) is True for lists.
 		"""
-		if isinstance(self.data, dict):
-			self.data = {k: v for k, v in self.data.items() if f(k, v)}
-		elif isinstance(self.data, list):
-			self.data = [x for x in self.data if f(x)]
+		get_at_current = self.get()
+		if isinstance(get_at_current, dict):
+			self.set({k: v for k, v in get_at_current.items() if f(k, v)})
+		elif isinstance(get_at_current, list):
+			self.set([x for x in get_at_current if f(x)])
 		else:
 			raise TypeError("PathDict filter: must be applied to a dict or list")
-		self.root_data = self.data
 		return self
 
 
@@ -299,9 +292,8 @@ class PDHandle:
 		"""
 			Returns a pretty indented string representation.
 		"""
-		data = json.dumps(self.data, indent=4, sort_keys=True, default=str)
-		root_data = json.dumps(self.data, indent=4, sort_keys=True, default=str)
-		return f"PDHandle({data = },\n{root_data = },\n{self.path_handle = })"
+
+		return f"PDHandle({self.data = }, {self.root_data = }, {self.path_handle = })"
 
 
 	def __getitem__(self, path):
