@@ -18,7 +18,7 @@ Lets look at this dict:
 
 ```python
 users = {
-"u1": {
+    "u1": {
         "name": "Julia",
         "age": 32,
         "interests": ["soccer", "basketball"],
