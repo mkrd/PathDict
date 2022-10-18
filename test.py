@@ -1,7 +1,3 @@
-
-from audioop import alaw2lin
-from math import fabs
-from ssl import OP_ENABLE_MIDDLEBOX_COMPAT
 from path_dict import pd
 import pytest
 import copy
@@ -221,7 +217,7 @@ def test_copy():
 	print(pd(j).at("1").copy())
 	assert pd(j).at("1").copy().get()     == j["1"]
 
-	assert pd(j).at("1").copy(at_root=True).get_root() == j
+	assert pd(j).at("1").copy(from_root=True).get_root() == j
 
 	# Nested
 	dc_pd = pd(users).copy()
@@ -560,13 +556,13 @@ def test_star_operations():
 	})
 
 	# Get names of all winners
-	winners = winners_original.copy(at_root=True)
+	winners = winners_original.copy(from_root=True)
 	assert winners.at("*", "podium", "*", "name").get_all() == [
 		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
 	]
 
 	# Increment age of all users by 1
-	winners = winners_original.copy(at_root=True)
+	winners = winners_original.copy(from_root=True)
 	winners.at("*/podium/*/age").map(lambda x: x + 1)
 	assert winners["2017", "podium", "17-place-1", "age"] == 23
 	assert winners["2017", "podium", "17-place-2", "age"] == 14
@@ -580,11 +576,20 @@ def test_star_operations():
 
 
 
-# def test_reduce():
-# 	users_pd = PathDict(users, deep_copy=True)
-# 	users_ages = users_pd.aggregate("users", init=0, f=lambda k, v, a: a + v["age"])
-# 	assert users_ages == 103
+def test_PDHandle_reduce():
+	users_pd = pd(users).copy()
 
-# 	pd = PathDict({"l1": [1, 2, 3]})
-# 	with pytest.raises(LookupError):
-# 		pd.aggregate("l1", init=0, f=lambda k, v, a: a + v)
+	users_ages = users_pd.at("users").reduce(lambda k, v, a: a + v["age"], aggregate=0)
+	assert users_ages == 103
+
+	p = pd({"l1": [1, 2, 3]})
+	assert p.at("l1").reduce(lambda v, a: a + v, aggregate=10) == 16
+
+	p = pd({"l1": "abc"})
+	with pytest.raises(TypeError):
+		p.at("l1").reduce(lambda v, a: a + v, aggregate=0)
+
+
+	p = pd(users).copy()
+	print(p.at("users/*/name").all().get())
+	# print(p.at("users/*/name").reduce(lambda v, a: f"{a}, {v}", aggregate=""))

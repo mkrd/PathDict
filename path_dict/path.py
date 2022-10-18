@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 from .utils import get_nested_keys_or_indices
 
 
@@ -9,6 +10,7 @@ class Path:
 
 
 	def __init__(self, *path, str_sep="/", raw=False):
+		# Careful, if the kwargs are passed as positional agrs, they are part of the path
 		self.str_sep = str_sep
 		self.raw = raw
 
@@ -56,6 +58,15 @@ class Path:
 
 	def __getitem__(self, key):
 		return self.path[key]
+
+
+
+	def copy(self, path=None, str_sep=None, raw=None) -> Path:
+		path_copy = copy.deepcopy(self.path) if path is None else path
+		str_sep_copy = str(self.str_sep) if str_sep is None else str_sep
+		raw_copy = self.raw if raw is None else raw
+		return Path(path_copy, str_sep=str_sep_copy, raw=raw_copy)
+
 
 
 	def expand(self, ref: dict | list) -> list[Path]:

@@ -26,18 +26,17 @@ class PDHandle:
 		self.path_handle = path
 
 
-	def copy(self, at_root=False) -> PDHandle:
+	def copy(self, from_root=False) -> PDHandle:
 		"""
 		Return a deep copy of the data at the current path or from the root.
 
-		:param at_root: If True, copy the root data instead of the current
-		path handle value.
+		:param from_root: If True, copy the root data instead of the current.
+		The current path handle will stay the same.
 		"""
-		path = copy.deepcopy(self.path_handle)
-		copied_data = copy.deepcopy(self.data if at_root else self.get())
-		if not at_root:
-			path.path = []
+		path = self.path_handle.copy(path=None if from_root else [])
+		copied_data = copy.deepcopy(self.data if from_root else self.get())
 		return PDHandle(copied_data, path)
+
 
 
 	############################################################################
@@ -247,18 +246,27 @@ class PDHandle:
 		return copy
 
 
-	# def reduce(self, *path, init=None, f: Callable = None):
-	# 	"""
-	# 		Reduce a value starting with init at the given path.
-	# 		f takes 3 arguments: key, values, and agg (initialized with init).
-	# 	"""
-	# 	path_val = self[path]
-	# 	if not isinstance(path_val, PathDict):
-	# 		raise LookupError("Aggregate only works on dicts")
-	# 	agg = init
-	# 	for k, v in path_val.items():
-	# 		agg = f(k, v, agg)
-	# 	return agg
+	def reduce(self, f: Callable, aggregate=None) -> Any:
+		"""
+		Reduce a value starting with init at the given path.
+		If at the selected path is a dict, the function f will be called with
+		(key, value, aggregate) as arguments.
+		If at the selected path is a list, the function f will be called with
+		(value, aggregate) as arguments.
+		"""
+
+		agg = aggregate
+		get_at_current = self.get()
+		if isinstance(get_at_current, dict):
+			for k, v in get_at_current.items():
+				agg = f(k, v, agg)
+			return agg
+		elif isinstance(get_at_current, list):
+			for v in get_at_current:
+				agg = f(v, agg)
+			return agg
+		else:
+			raise TypeError("PathDict reduce: must be applied to a dict or list")
 
 
 	############################################################################
