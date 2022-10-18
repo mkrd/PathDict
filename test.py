@@ -589,7 +589,5 @@ def test_PDHandle_reduce():
 	with pytest.raises(TypeError):
 		p.at("l1").reduce(lambda v, a: a + v, aggregate=0)
 
-
 	p = pd(users).copy()
-	print(p.at("users/*/name").all().get())
-	# print(p.at("users/*/name").reduce(lambda v, a: f"{a}, {v}", aggregate=""))
+	assert p.at("users/*/name").reduce(lambda v, a: a + [v], aggregate=[]) == ["Joe", "Ben", "Sue"]

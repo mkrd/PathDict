@@ -67,24 +67,8 @@ class PDMultiHandle:
 		"""
 		Get all values of the given multi-path, and reduce them using f.
 		"""
-		print("🖲", self.all(as_type, include_paths).get())
 		return self.all(as_type, include_paths).reduce(f, aggregate)
 
 
-
-
-
 	# def filtered(self, f: Callable[[Any], bool], as_type="list", include_paths=False) -> PDHandle:
-	# 	raise NotImplementedError
-
-
-
-
-	# def reduced(self, f: Callable[[Any, Any], Any], initial=None) -> PDHandle:
-	# 	"""
-	# 	Reduce the values at the given path with the given function.
-	# 	"""
-	# 	# 	copy = self.copy()
-	# 	# 	copy.reduce(f, initial)
-	# 	# 	return copy
 	# 	raise NotImplementedError
