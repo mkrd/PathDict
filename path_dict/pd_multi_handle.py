@@ -1,5 +1,4 @@
 from __future__ import annotations
-import copy
 from typing import Any, Callable
 from . path import Path
 from . pd_handle import PDHandle
