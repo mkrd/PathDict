@@ -11,6 +11,7 @@ class PDHandle:
 	data:      dict | list | Any
 	path_handle: Path
 
+
 	def __init__(self, data: dict | list, path: Path) -> None:
 		"""
 		A PDHandle always refers to a dict or list.
@@ -27,6 +28,10 @@ class PDHandle:
 		self.root_data = data  # The original data that was passed to the first PDHandle
 		self.data = data
 		self.path_handle = path
+
+
+	def __repr__(self) -> str:
+		return f"PDHandle({self.data = }, {self.root_data = }, {self.path_handle = })"
 
 
 	def copy(self, from_root=False) -> PDHandle:
@@ -182,7 +187,11 @@ class PDHandle:
 				self.data.clear()
 				self.data.extend(value)
 				return self
-			raise TypeError("PathDict set: At the root level, you can only set a dict to a dict or a list to a list")
+			raise TypeError(
+				"PathDict set: At the root level, you can only set dict dict or"
+				f"list to a list (tried to set a {type(self.data)} to a "
+				f"{type(value)})."
+			)
 
 		# Iterate over all keys except the last one
 		current = self.data
@@ -196,7 +205,7 @@ class PDHandle:
 			try:
 				current[int(key)] = value
 			except (ValueError, IndexError, TypeError) as e:
-				raise KeyError(f"PDHandle.set: invalid path {self.path_handle}") from e
+				raise KeyError(f"PathDict set: invalid path {self.path_handle}") from e
 
 		return self
 
@@ -276,6 +285,11 @@ class PDHandle:
 		raise TypeError("PathDict reduce: must be applied to a dict or list")
 
 
+	############################################################################
+	#### Useful Shorthands
+	############################################################################
+
+
 	def sum(self) -> Any:
 		"""
 		Sum the elements at the given path.
@@ -307,10 +321,6 @@ class PDHandle:
 
 	# def __iter__(self):
 	# 	return iter(self.data)
-
-
-	def __repr__(self) -> str:
-		return f"PDHandle({self.data = }, {self.root_data = }, {self.path_handle = })"
 
 
 	def __getitem__(self, path):

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable
+from typing import Any, Callable, Union
 from . path import Path
 from . pd_handle import PDHandle
 
@@ -8,27 +8,30 @@ class PDMultiHandle:
 	path_handle: Path
 	root_data: dict | list
 
+
 	def __init__(self, data: dict | list, path: Path):
 		self.path_handle = path
 		self.root_data = data
 
 
-	def all(self, as_type="list", include_paths=False) -> PDHandle:
-		"""
-		Get PDHandle on all values at the given path.
+	def __repr__(self) -> str:
+		return f"PDMultiHandle({self.root_data = }, {self.path_handle = })"
 
+
+	############################################################################
+	# Setters
+	# Setters ALWAYS return a value
+	############################################################################
+
+
+	def gather(self, as_type="list", include_paths=False) -> dict | list:
+		"""
+		Get the actual value at the given path.
+
+		:param as_pd: If true, return a PDHandle on the result. Else, return the dict or list itself.
 		:param as_type: If list, return PDHandle on list of values. If dict, return PDHandle on dict that looks like {tuple(path): value}
 		:param include_paths: If true and as_type is list, return a list of (path, value) tuples instead of just values.
 		:return: PDHandle on the result.
-		"""
-		data = self.get_all(as_type, include_paths)
-		path = self.path_handle.copy(path=[])
-		return PDHandle(data, path)
-
-
-	def get_all(self, as_type="list", include_paths=False) -> dict | list:
-		"""
-		Get the actual value at the given path.
 		"""
 		if as_type not in ["list", "dict"]:
 			raise ValueError("Can only return as dict or list, not both")
@@ -39,12 +42,22 @@ class PDMultiHandle:
 			for path in self.path_handle.expand(self.root_data):
 				data = handle.at(path.path).get()
 				res.append((tuple(path.path), data) if include_paths else data)
-			return res
 		# as_type == "dict"
-		res = {}
-		for path in self.path_handle.expand(self.root_data):
-			res[tuple(path.path)] = handle.at(path.path).get()
+		else:
+			res = {}
+			for path in self.path_handle.expand(self.root_data):
+				res[tuple(path.path)] = handle.at(path.path).get()
 		return res
+
+
+	def gather_pd(self, as_type="list", include_paths=False) -> PDHandle:
+		data = self.gather(as_type=as_type, include_paths=include_paths)
+		return PDHandle(data, self.path_handle.copy(path=[]))
+
+	############################################################################
+	# Setters
+	# Setters ALWAYS return a handle, not the value.
+	############################################################################
 
 
 	def map(self, f: Callable) -> PDHandle:
@@ -62,9 +75,7 @@ class PDMultiHandle:
 		"""
 		Get all values of the given multi-path, and reduce them using f.
 		"""
-		data = self.get_all(as_type, include_paths)
-		path = self.path_handle.copy(path=[])
-		return PDHandle(data, path).reduce(f, aggregate)
+		return self.gather_pd(as_type=as_type, include_paths=include_paths).reduce(f, aggregate)
 
 
 	############################################################################
@@ -77,9 +88,7 @@ class PDMultiHandle:
 		At the current path only keep the elements for which f(key, value)
 		is True for dicts, or f(value) is True for lists.
 		"""
-		data = self.get_all(as_type, include_paths)
-		path = self.path_handle.copy(path=[])
-		return PDHandle(data, path).filter(f)
+		return self.gather_pd(as_type=as_type, include_paths=include_paths).filter(f)
 
 
 	# def filtered(self, f: Callable[[Any], bool], as_type="list", include_paths=False) -> PDHandle:
@@ -95,4 +104,15 @@ class PDMultiHandle:
 		"""
 		Sum all values at the given multi-path.
 		"""
-		return self.reduce(lambda x, a: x + a, aggregate=0)
+		return sum(self.gather())
+
+
+	def set(self, value: Any) -> PDHandle:
+		for path in self.path_handle.expand(self.root_data):
+			PDHandle(self.root_data, path).set(value)
+		return self
+
+
+	############################################################################
+	#### Standard dict methods
+	############################################################################

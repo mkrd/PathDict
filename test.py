@@ -100,7 +100,7 @@ def test_at_parent():
 
 
 def test_at_children():
-	assert pd(db).at("users").at_children().get_all() == [u for u in db["users"].values()]
+	assert pd(db).at("users").at_children().gather() == [u for u in db["users"].values()]
 
 
 def test_simple_get():
@@ -367,12 +367,12 @@ def test_PDMultiHandle_get_all():
 
 	p = pd(db)
 
-	assert p.at("nonexistent/*").get_all() == []
-	assert p.at("*/nonexistent/*").get_all() == []
-	# assert p.at("*/nonexistent").get_all() == []
+	assert p.at("nonexistent/*").gather() == []
+	assert p.at("*/nonexistent/*").gather() == []
+	# assert p.at("*/nonexistent").gather() == []
 
 	# Finds all values, returns as list
-	assert p.at("*").get_all() == [
+	assert p.at("*").gather() == [
 		{
 			"a1": 1,
 			"a2": 2,
@@ -385,10 +385,10 @@ def test_PDMultiHandle_get_all():
 		},
 	]
 
-	assert p.at("*", "a1").get_all() == [1, None]
-	assert p.at("*", "*").get_all() == [1, 2, 3, 4, 5, 6]
+	assert p.at("*", "a1").gather() == [1, None]
+	assert p.at("*", "*").gather() == [1, 2, 3, 4, 5, 6]
 
-	assert p.at("*", "*").get_all(include_paths=True) == [
+	assert p.at("*", "*").gather(include_paths=True) == [
 		(("a", "a1"), 1),
 		(("a", "a2"), 2),
 		(("a", "a3"), 3),
@@ -397,7 +397,7 @@ def test_PDMultiHandle_get_all():
 		(("b", "b3"), 6),
 	]
 
-	assert p.at("*", "*").get_all(as_type="dict") == {
+	assert p.at("*", "*").gather(as_type="dict") == {
 		("a", "a1"): 1,
 		("a", "a2"): 2,
 		("a", "a3"): 3,
@@ -407,7 +407,7 @@ def test_PDMultiHandle_get_all():
 	}
 
 	with pytest.raises(ValueError):
-		p.at("*", "*").get_all(as_type="invalid")
+		p.at("*", "*").gather(as_type="invalid")
 
 
 
@@ -432,10 +432,10 @@ def test_PDMultiHandle_get_all_2():
 		},
 	})
 
-	ages = p.at(["*", "age"]).get_all()
+	ages = p.at(["*", "age"]).gather()
 	assert ages == [22, 49, 36]
 
-	ages_sum = sum(p.at("*/age").get_all())
+	ages_sum = sum(p.at("*/age").gather())
 	assert ages_sum == 107
 
 	# ages_over_30 = p.at("*/age").filtered(lambda x: x > 30)
@@ -456,9 +456,9 @@ def test_PDMultiHandle_get_all_3():
 		"1": [2, 3, 4],
 		"2": "3",
 	})
-	assert p.at("1/*").get_all() == [2, 3, 4]
+	assert p.at("1/*").gather() == [2, 3, 4]
 	with pytest.raises(KeyError):
-		p.at("2/*").get_all()
+		p.at("2/*").gather()
 
 
 def test_PDHandle_filter():
@@ -557,7 +557,7 @@ def test_star_operations():
 
 	# Get names of all winners
 	winners = winners_original.copy(from_root=True)
-	assert winners.at("*", "podium", "*", "name").get_all() == [
+	assert winners.at("*", "podium", "*", "name").gather() == [
 		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
 	]
 
@@ -571,7 +571,7 @@ def test_star_operations():
 	assert winners["2018", "podium", "18-place-2", "age"] == 33
 	assert winners["2018", "podium", "18-place-3", "age"] == 27
 
-	names_2017 = winners.at("2017", "podium", "*", "name").get_all()
+	names_2017 = winners.at("2017", "podium", "*", "name").gather()
 	assert names_2017 == ["Joe", "Ben", "Sue"]
 
 
@@ -660,3 +660,8 @@ def test_scenario_3():
 	assert j.at("b").sum() == 3
 	with pytest.raises(TypeError):
 		j.at("e").sum()
+
+
+def test_PDMultiHandle__repr__():
+	p = pd({})
+	assert str(p.at("*")) == "PDMultiHandle(self.root_data = {}, self.path_handle = Path(path=['*'], str_sep=/, raw=False))"
