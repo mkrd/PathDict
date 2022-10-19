@@ -649,3 +649,14 @@ def test_scenario_3():
 	).at("*/expenses/*").filter(
 		lambda v: v["currency"] == "CHF"
 	).at("*/amount").sum() == 50
+
+
+	j = pd({
+		"a": [1, 2],
+		"b": {"c": 1, "d": 2},
+		"e": 5,
+	})
+	assert j.at("a").sum() == 3
+	assert j.at("b").sum() == 3
+	with pytest.raises(TypeError):
+		j.at("e").sum()
