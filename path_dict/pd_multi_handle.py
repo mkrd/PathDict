@@ -68,6 +68,11 @@ class PDMultiHandle:
 		return PDHandle(data, path).reduce(f, aggregate)
 
 
+	############################################################################
+	#### Filter
+	############################################################################
+
+
 	def filter(self, f: Callable, as_type="list", include_paths=False) -> PDHandle:
 		"""
 		At the current path only keep the elements for which f(key, value)
@@ -78,12 +83,17 @@ class PDMultiHandle:
 		return PDHandle(data, path).filter(f)
 
 
+	# def filtered(self, f: Callable[[Any], bool], as_type="list", include_paths=False) -> PDHandle:
+	# 	raise NotImplementedError
+
+
+	############################################################################
+	#### Useful shorthands
+	############################################################################
+
+
 	def sum(self) -> Any:
 		"""
 		Sum all values at the given multi-path.
 		"""
 		return self.reduce(lambda x, a: x + a, aggregate=0)
-
-
-	# def filtered(self, f: Callable[[Any], bool], as_type="list", include_paths=False) -> PDHandle:
-	# 	raise NotImplementedError
