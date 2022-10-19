@@ -665,3 +665,37 @@ def test_scenario_3():
 def test_PDMultiHandle__repr__():
 	p = pd({})
 	assert str(p.at("*")) == "PDMultiHandle(self.root_data = {}, self.path_handle = Path(path=['*'], str_sep=/, raw=False))"
+
+
+def test_PDMultiHandle_set():
+	db = {
+		"meta": {
+			"version": 1,
+		},
+		"users": {
+			"1": {
+				"name": "John",
+				"age": 20,
+				"friends": ["2", "3"],
+			},
+			"2": {
+				"name": "Jane",
+				"age": 21,
+				"friends": ["1", "3"],
+			},
+			"3": {
+				"name": "Jack",
+				"age": 22,
+				"friends": ["1", "2"],
+			},
+		},
+	}
+	p = pd(db).copy()
+	p.at("users/*/friends").set([])
+	p["users/*/blip"] = "blap"
+	assert p["users", "1", "friends"] == []
+	assert p["users", "2", "friends"] == []
+	assert p["users", "3", "friends"] == []
+	assert p["users", "1", "blip"] == "blap"
+	assert p["users", "2", "blip"] == "blap"
+	assert p["users", "3", "blip"] == "blap"
