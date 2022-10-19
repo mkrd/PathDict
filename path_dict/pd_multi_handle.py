@@ -38,13 +38,13 @@ class PDMultiHandle:
 		if as_type == "list":
 			res = []
 			for path in self.path_handle.expand(self.root_data):
-				data = handle.at(path).get()
+				data = handle.at(path.path).get()
 				res.append((tuple(path.path), data) if include_paths else data)
 			return res
 		# as_type == "dict"
 		res = {}
 		for path in self.path_handle.expand(self.root_data):
-			res[tuple(path.path)] = handle.at(path).get()
+			res[tuple(path.path)] = handle.at(path.path).get()
 		return res
 
 
@@ -63,7 +63,9 @@ class PDMultiHandle:
 		"""
 		Get all values of the given multi-path, and reduce them using f.
 		"""
-		return self.all(as_type, include_paths).reduce(f, aggregate)
+		data = self.get_all(as_type, include_paths)
+		path = self.path_handle.copy(path=[])
+		return PDHandle(data, path).reduce(f, aggregate)
 
 
 	def filter(self, f: Callable, as_type="list", include_paths=False) -> PDHandle:
