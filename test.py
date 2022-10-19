@@ -591,3 +591,61 @@ def test_PDHandle_reduce():
 
 	p = pd(users).copy()
 	assert p.at("users/*/name").reduce(lambda v, a: a + [v], aggregate=[]) == ["Joe", "Ben", "Sue"]
+
+
+def test_PDMultiHandle_sum():
+	p = pd({
+		"1": {"a": 1, "b": [1]},
+		"2": {"a": 3, "b": [1]},
+	})
+	assert p.at("*/a").sum() == 4
+	with pytest.raises(TypeError):
+		p.at("*/b").sum()
+
+
+def test_scenario_3():
+	u = pd({
+		"1": {
+			"name": "Joe",
+			"currencies": ["EUR", "CHF"],
+			"expenses": {
+				"1": {"amount": 100, "currency": "EUR"},
+				"2": {"amount": 50, "currency": "CHF"},
+				"3": {"amount": 200, "currency": "EUR"},
+			}
+		},
+		"2": {
+			"name": "Ben",
+			"currencies": ["EUR", "USD"],
+			"expenses": {
+				"1": {"amount": 3, "currency": "EUR"},
+				"2": {"amount": 40, "currency": "USD"},
+				"3": {"amount": 10, "currency": "USD"},
+			}
+		},
+		"3": {
+			"name": "Sue",
+			"currencies": ["CHF", "USD"],
+			"expenses": {
+				"1": {"amount": 500, "currency": "CHF"},
+				"2": {"amount": 300, "currency": "CHF"},
+				"3": {"amount": 200, "currency": "USD"},
+			}
+		},
+	})
+
+	assert u.at("*/expenses/*/amount").sum() == 1403
+	assert u.at("2/expenses/*/amount").sum() == 53
+	assert u.at("*/expenses/1/amount").sum() == 603
+	# Get sum of all expenses in EUR
+
+
+	assert u.copy(from_root=True).at("*/expenses/*").filter(lambda v: v["currency"] == "EUR").at("*/amount").sum() == 303
+
+
+	# Get all transactions in CHF except for those of sue
+	assert u.at("*").filter(
+		lambda x: x["name"] != "Sue"
+	).at("*/expenses/*").filter(
+		lambda v: v["currency"] == "CHF"
+	).at("*/amount").sum() == 50
