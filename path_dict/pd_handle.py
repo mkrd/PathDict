@@ -70,10 +70,9 @@ class PDHandle:
 		example, "*" will not be interpreted as a wildcard, but as a usual key.
 		"""
 
-		self.path_handle = Path(*path,
-			str_sep=str_sep or self.path_handle.str_sep,
-			raw=raw or self.path_handle.raw,
-		)
+		str_sep = self.path_handle.str_sep if str_sep is None else str_sep
+		raw = self.path_handle.raw if raw is None else raw
+		self.path_handle = Path(*path, str_sep=str_sep, raw=raw)
 
 		if self.path_handle.has_wildcards:
 			return PDMultiHandle(self.root_data, self.path_handle)

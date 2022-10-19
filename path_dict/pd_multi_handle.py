@@ -71,7 +71,9 @@ class PDMultiHandle:
 		At the current path only keep the elements for which f(key, value)
 		is True for dicts, or f(value) is True for lists.
 		"""
-		return self.all(as_type=as_type, include_paths=include_paths).filter(f)
+		data = self.get_all(as_type, include_paths)
+		path = self.path_handle.copy(path=[])
+		return PDHandle(data, path).filter(f)
 
 
 	def sum(self) -> Any:

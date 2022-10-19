@@ -93,4 +93,4 @@ class Path:
 
 		# Return empty list if no paths were found
 		paths = paths if paths != [[]] else []
-		return [Path(path) for path in paths]
+		return [Path(path, str_sep=self.str_sep, raw=self.raw) for path in paths]
