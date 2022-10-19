@@ -19,7 +19,10 @@ class PDHandle:
 		"""
 
 		if not isinstance(data, (dict, list)):
-			raise TypeError("PathDict init: data argument must be a dict or list")
+			raise TypeError(
+				f"PathDict init: data must be dict or list but is {type(data)} "
+				f"({data})"
+			)
 
 		self.root_data = data  # The original data that was passed to the first PDHandle
 		self.data = data
@@ -109,6 +112,7 @@ class PDHandle:
 
 	############################################################################
 	# Getters
+	# Getters ALWAYS return actual values, not handles.
 	############################################################################
 
 
@@ -160,6 +164,7 @@ class PDHandle:
 
 	############################################################################
 	# Setters
+	# Setters ALWAYS return a handle, not the value.
 	############################################################################
 
 
@@ -218,6 +223,7 @@ class PDHandle:
 
 	############################################################################
 	# Filter
+	# Filter ALWAYS return a handle, not the value.
 	############################################################################
 
 
@@ -228,22 +234,25 @@ class PDHandle:
 		"""
 		get_at_current = self.get()
 		if isinstance(get_at_current, dict):
-			self.set({k: v for k, v in get_at_current.items() if f(k, v)})
-		elif isinstance(get_at_current, list):
-			self.set([x for x in get_at_current if f(x)])
-		else:
-			raise TypeError("PathDict filter: must be applied to a dict or list")
-		return self
+			return self.set({k: v for k, v in get_at_current.items() if f(k, v)})
+		if isinstance(get_at_current, list):
+			return self.set([x for x in get_at_current if f(x)])
+		raise TypeError("PathDict filter: must be applied to a dict or list")
+
 
 
 	def filtered(self, f: Callable) -> PDHandle:
 		"""
-		Like filter, but does not modify the dict,
-		but creates a copy with filter applied to it.
+		Shortcut for:
+		>>> copy().filter(f)
 		"""
-		copy = self.copy()
-		copy.filter(f)
-		return copy
+
+		return self.copy().filter(f)
+
+
+	############################################################################
+	# Reduce
+	############################################################################
 
 
 	def reduce(self, f: Callable, aggregate=None) -> Any:
@@ -261,12 +270,23 @@ class PDHandle:
 			for k, v in get_at_current.items():
 				agg = f(k, v, agg)
 			return agg
-		elif isinstance(get_at_current, list):
+		if isinstance(get_at_current, list):
 			for v in get_at_current:
 				agg = f(v, agg)
 			return agg
-		else:
-			raise TypeError("PathDict reduce: must be applied to a dict or list")
+		raise TypeError("PathDict reduce: must be applied to a dict or list")
+
+
+	def sum(self) -> Any:
+		"""
+		Sum the elements at the given path.
+		"""
+		get_at_current = self.get()
+		if isinstance(get_at_current, dict):
+			return sum(v for k, v in get_at_current.items())
+		if isinstance(get_at_current, list):
+			return sum(get_at_current)
+		raise TypeError("PathDict sum: must be applied to a dict or list")
 
 
 	############################################################################

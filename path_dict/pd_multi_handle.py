@@ -24,9 +24,7 @@ class PDMultiHandle:
 		"""
 		data = self.get_all(as_type, include_paths)
 		path = self.path_handle.copy(path=[])
-
-		handle = PDHandle(data, path)
-		return handle
+		return PDHandle(data, path)
 
 
 	def get_all(self, as_type="list", include_paths=False) -> dict | list:
@@ -36,20 +34,18 @@ class PDMultiHandle:
 		if as_type not in ["list", "dict"]:
 			raise ValueError("Can only return as dict or list, not both")
 
+		handle = PDHandle(self.root_data, self.path_handle)
 		if as_type == "list":
 			res = []
 			for path in self.path_handle.expand(self.root_data):
-				data = PDHandle(self.root_data, path).get()
-				# TODO: Automatically recognize if the user wants the path
-				# as a string or list
+				data = handle.at(path).get()
 				res.append((tuple(path.path), data) if include_paths else data)
 			return res
 		# as_type == "dict"
-		else:
-			res = {}
-			for path in self.path_handle.expand(self.root_data):
-				res[tuple(path.path)] = PDHandle(self.root_data, path).get()
-			return res
+		res = {}
+		for path in self.path_handle.expand(self.root_data):
+			res[tuple(path.path)] = handle.at(path).get()
+		return res
 
 
 	def map(self, f: Callable) -> PDHandle:
@@ -63,11 +59,26 @@ class PDMultiHandle:
 		return PDHandle(self.root_data, self.path_handle)
 
 
-	def reduce(self, f: Callable, aggregate=None, as_type="list", include_paths=False) -> Any:
+	def reduce(self, f: Callable, aggregate: Any, as_type="list", include_paths=False) -> Any:
 		"""
 		Get all values of the given multi-path, and reduce them using f.
 		"""
 		return self.all(as_type, include_paths).reduce(f, aggregate)
+
+
+	def filter(self, f: Callable, as_type="list", include_paths=False) -> PDHandle:
+		"""
+		At the current path only keep the elements for which f(key, value)
+		is True for dicts, or f(value) is True for lists.
+		"""
+		return self.all(as_type=as_type, include_paths=include_paths).filter(f)
+
+
+	def sum(self) -> Any:
+		"""
+		Sum all values at the given multi-path.
+		"""
+		return self.reduce(lambda x, a: x + a, aggregate=0)
 
 
 	# def filtered(self, f: Callable[[Any], bool], as_type="list", include_paths=False) -> PDHandle:

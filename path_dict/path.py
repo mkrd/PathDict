@@ -19,6 +19,12 @@ class Path:
 		if len(path) == 1 and isinstance(path[0], list):
 			# If the path is a list, then we are good to go
 			self.path = path[0]
+		elif len(path) == 1 and isinstance(path[0], Path):
+			cpy = path[0].copy()
+			self.path = cpy.path
+			self.str_sep = cpy.str_sep
+			self.raw = cpy.raw
+			return
 		else:
 			# In raw mode, a tuple is considered a key
 			self.path = [path] if raw else list(path)
