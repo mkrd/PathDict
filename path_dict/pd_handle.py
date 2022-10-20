@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable, Union
+from typing import Any, Callable
 import copy
 from . import utils
 from . path import Path
@@ -54,7 +54,7 @@ class PDHandle:
 	############################################################################
 
 
-	def at(self, *path, str_sep=None, raw=None) -> Union[PDHandle, PDMultiHandle]:
+	def at(self, *path, str_sep=None, raw=None) -> PDHandle | PDMultiHandle:
 		"""
 		Calling at(path) moves the handle to the given path, and returns the
 		handle.
@@ -122,7 +122,7 @@ class PDHandle:
 	############################################################################
 
 
-	def get(self, default=None) -> list | dict | Any:
+	def get(self, default=None) -> dict | list | Any:
 		"""
 		Get the actual value at the given path.
 		If the path is vaild but does not exist, return None (default).
@@ -154,14 +154,14 @@ class PDHandle:
 		return current
 
 
-	def get_root(self) -> list | dict:
+	def get_root(self) -> dict | list:
 		"""
 		Get the original data that was passed to the first PDHandle
 		"""
 		return self.root_data
 
 
-	def get_at(self, *path) -> list | dict | Any:
+	def get_at(self, *path) -> dict | list | Any:
 		"""
 		Get the value at the given path.
 		"""
