@@ -1,8 +1,5 @@
-import sys
-from . pd_handle import PDHandle
 from . path import Path
-
-
+from . pd_handle import PDHandle
 
 
 def pd(data: dict | list, str_sep="/", raw=False) -> PDHandle:

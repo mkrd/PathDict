@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable, Union
+from typing import Any, Callable
 from . path import Path
 from . pd_handle import PDHandle
 

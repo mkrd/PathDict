@@ -1,6 +1,6 @@
 from __future__ import annotations
 import copy
-from .utils import get_nested_keys_or_indices
+from . utils import get_nested_keys_or_indices
 
 
 class Path:
