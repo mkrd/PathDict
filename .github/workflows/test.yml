@@ -68,15 +68,15 @@ jobs:
         uses: tj-actions/verify-changed-files@v11.1
         id: changed_files
         with:
-          files: coverage.svg
+          files: assets/coverage.svg
 
       - name: Commit files
         if: steps.changed_files.outputs.files_changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add coverage.svg
-          git commit -m "Updated coverage.svg"
+          git add assets/coverage.svg
+          git commit -m "Updated assets/coverage.svg"
 
       - name: Push changes
         if: steps.changed_files.outputs.files_changed == 'true'
