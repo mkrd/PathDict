@@ -5,7 +5,7 @@
 [![Monthly Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
 [![Weekly Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
 ![Tests](https://github.com/mkrd/PathDict/actions/workflows/test.yml/badge.svg)
-![Coverage](https://github.com/mkrd/PathDict/blob/master/coverage.svg?raw=true)
+![Coverage](https://github.com/mkrd/PathDict/blob/master/coverage.svg?raw=1)
 
 
 Why do I need this?
@@ -290,3 +290,35 @@ friend_ages = joe.aggregate("friends", init=0, f=lambda k, v, a: a + v["age"])
 
 To serialize a PathDict to JSON, call `json.dumps(<PathDict>.dict)`.
 If you try to serialize a PathDict object itself, the operation will fail.
+
+
+
+# Reference
+
+
+### pd(data: dict | list, str_sep="/", raw=False) -> PDHandle
+
+Creates and returns a handle on the given data.
+
+ Args:
+- `data` - Must be a list or dict.
+- `str_sep` - Look within path strings for this separator and use it to split the path.
+- `raw` - If `True`, do not interpret paths. So wildcards (`*`) are interpreted as a usual key, and tuples will be interpreted as keys  as well.
+
+Returns:
+- A handle that references the root of the given data dict or list.
+
+
+## PDHandle
+
+### copy(self, from_root=False) -> PDHandle
+
+Return a deep copy of the data at the current path or from the root.
+
+Args:
+- `from_root` - If `True`, the copy will not be made at the root data, and not where the current path is. The path handle will be at the same location as it was in the original. If `False`, only the part of the data where the current path handle is at will be copied.
+
+Returns:
+- A handle on the newly created copy
+
+The current path handle will stay the same.

@@ -37,8 +37,11 @@ class PDHandle:
 		"""
 		Return a deep copy of the data at the current path or from the root.
 
-		:param from_root: If True, copy the root data instead of the current.
-		The current path handle will stay the same.
+		Args:
+		- `from_root` - If `True`, the copy will not be made at the root data, and not where the current path is. The path handle will be at the same location as it was in the original. If `False`, only the part of the data where the current path handle is at will be copied.
+
+		Returns:
+		- A handle on the newly created copy
 		"""
 		path = self.path_handle.copy(path=None if from_root else [])
 		copied_data = copy.deepcopy(self.data if from_root else self.get())
