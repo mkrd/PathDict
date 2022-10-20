@@ -5,7 +5,7 @@
 [![Monthly Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
 [![Weekly Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
 ![Tests](https://github.com/mkrd/PathDict/actions/workflows/test.yml/badge.svg)
-![Coverage](https://github.com/mkrd/PathDict/blob/master/coverage.svg)
+![Coverage](https://github.com/mkrd/PathDict/blob/master/coverage.svg?raw=true)
 
 
 Why do I need this?
