@@ -163,7 +163,10 @@ class PDHandle:
 		"""
 		Get the value at the given path.
 		"""
-		return self.at(*path).get()
+		at = self.at(*path)
+		if self.path_handle.has_wildcards:
+			return at.gather()
+		return at.get()
 
 
 	############################################################################
@@ -325,6 +328,8 @@ class PDHandle:
 
 	def __getitem__(self, path):
 		at = self.at(*path) if isinstance(path, tuple) else self.at(path)
+		if self.path_handle.has_wildcards:
+			return at.gather()
 		res = at.get()
 		self.at_root()
 		return res

@@ -1,4 +1,4 @@
-from path_dict import PathDict
+from path_dict import pd
 
 users = {
 	"u1": {
@@ -14,7 +14,7 @@ users = {
 }
 
 
-users = PathDict(users)
+users = pd(users)
 
 # Get all user names
 users["*", "name"]  # -> ["Julia", "Ben"]
@@ -25,15 +25,15 @@ users["u1", "age"] = 33
 print(f"{users['u1', 'age'] = }")  # -> 33
 
 # Append interest "cooking" to all users
-users["*", "interests"] = lambda interests: interests + ["cooking"]
+users["*", "interests"] = lambda i: i + ["cooking"]
 print(users)
 
 # Remove all interests of Ben which do not start with "a" ("cooking is removed")
-users.filter("u2", "interests", f=lambda interest: not interest.startswith("a"))
+users.at("u2/interests").filter(lambda i: not i.startswith("a"))
 print(users)
 
 # Remove users that are younger than 30
-users.filter(f=lambda id, user: user["age"] >= 30)
+users.at().filter(lambda id, user: user["age"] >= 30)
 print(users)
 
 
@@ -60,34 +60,34 @@ crawler_output = {
 	]
 }
 
-# Get all deleted Posts:
-deleted_posts = []
-for post in crawler_output["posts"]:
-	if "meta" in post:
-		if post["meta"].get("deleted", False):
-			deleted_posts.append(post)
+# # Get all deleted Posts:
+# deleted_posts = []
+# for post in crawler_output["posts"]:
+# 	if "meta" in post:
+# 		if post["meta"].get("deleted", False):
+# 			deleted_posts.append(post)
 
-# Or
-deleted_posts = [post for post in crawler_output["posts"] if post.get("meta", {}).get("deleted", False)]
+# # Or
+# deleted_posts = [post for post in crawler_output["posts"] if post.get("meta", {}).get("deleted", False)]
 
-# Remove all deleted posts
-db["posts"] = [post for post in crawler_output["posts"] if not post.get("meta", {}).get("deleted", False)]
+# # Remove all deleted posts
+# db["posts"] = [post for post in crawler_output["posts"] if not post.get("meta", {}).get("deleted", False)]
 
-print("Deleted Posts:")
-print(deleted_posts)
+# print("Deleted Posts:")
+# print(deleted_posts)
 
-# PD version get deleted posts
-pd = PathDict(crawler_output)
-deleted_posts = pd.filtered("posts", lambda x: x["meta", "deleted"])["posts"]
-print(deleted_posts)
-# Current
-deleted_posts = crawler_output.filtered("posts", lambda x: x["meta", "deleted"])["posts"]
-# New alternative 1
-deleted_posts = pd(crawler_output).filtered("posts", lambda x: x["meta", "deleted"])["posts"]
-# New alternative 2
-deleted_posts = pd.filtered(crawler_output, "posts", lambda x: x["meta", "deleted"])["posts"]
+# # PD version get deleted posts
+# pd = PathDict(crawler_output)
+# deleted_posts = pd.filtered("posts", lambda x: x["meta", "deleted"])["posts"]
+# print(deleted_posts)
+# # Current
+# deleted_posts = crawler_output.filtered("posts", lambda x: x["meta", "deleted"])["posts"]
+# # New alternative 1
+# deleted_posts = pd(crawler_output).filtered("posts", lambda x: x["meta", "deleted"])["posts"]
+# # New alternative 2
+# deleted_posts = pd.filtered(crawler_output, "posts", lambda x: x["meta", "deleted"])["posts"]
 
 
 
-# PD version remove deleted posts
-pd.filter("posts", f=lambda x: not x["meta", "deleted"])
+# # PD version remove deleted posts
+# pd.filter("posts", f=lambda x: not x["meta", "deleted"])
