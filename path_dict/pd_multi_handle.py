@@ -52,7 +52,7 @@ class PDMultiHandle:
 
 	def gather_pd(self, as_type="list", include_paths=False) -> PDHandle:
 		data = self.gather(as_type=as_type, include_paths=include_paths)
-		return PDHandle(data, self.path_handle.copy(path=[]))
+		return PDHandle(data, self.path_handle.deepcopy(path=[]))
 
 	############################################################################
 	# Setters

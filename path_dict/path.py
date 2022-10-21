@@ -61,12 +61,11 @@ class Path:
 
 
 
-	def copy(self, path=None, str_sep=None, raw=None) -> Path:
+	def deepcopy(self, path=None, str_sep=None, raw=None) -> Path:
 		path_copy = copy.deepcopy(self.path) if path is None else path
 		str_sep_copy = str(self.str_sep) if str_sep is None else str_sep
 		raw_copy = self.raw if raw is None else raw
 		return Path(path_copy, str_sep=str_sep_copy, raw=raw_copy)
-
 
 
 	def expand(self, ref: dict | list) -> list[Path]:

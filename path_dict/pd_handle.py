@@ -32,7 +32,7 @@ class PDHandle:
 		return f"PDHandle({self.data = }, {self.path_handle = })"
 
 
-	def copy(self, from_root=False) -> PDHandle:
+	def deepcopy(self, from_root=False) -> PDHandle:
 		"""
 		Return a deep copy of the data at the current path or from the root.
 
@@ -42,10 +42,24 @@ class PDHandle:
 		Returns:
 		- A handle on the newly created copy
 		"""
-		path = self.path_handle.copy(path=None if from_root else [])
+		path = self.path_handle.deepcopy(path=None if from_root else [])
 		copied_data = copy.deepcopy(self.data if from_root else self.get())
 		return PDHandle(copied_data, path)
 
+
+	def copy(self, from_root=False) -> PDHandle:
+		"""
+		Return a shallow copy of the data at the current path or from the root.
+
+		Args:
+		- `from_root` - If `True`, the copy will not be made at the root data, and not where the current path is. The path handle will be at the same location as it was in the original. If `False`, only the part of the data where the current path handle is at will be copied.
+
+		Returns:
+		- A handle on the newly created copy
+		"""
+		path = self.path_handle.deepcopy(path=None if from_root else [])
+		copied_data = copy.copy(self.data if from_root else self.get())
+		return PDHandle(copied_data, path)
 
 
 	############################################################################
@@ -213,7 +227,7 @@ class PDHandle:
 		set path, applies map with f at that path, and returns the handle.
 		"""
 		current_handle = self.path_handle
-		return self.at().copy().at(current_handle.path).map(f)
+		return self.at().deepcopy().at(current_handle.path).map(f)
 
 
 	############################################################################
@@ -242,7 +256,7 @@ class PDHandle:
 		>>> copy().filter(f)
 		"""
 
-		return self.copy().filter(f)
+		return self.deepcopy().filter(f)
 
 
 	############################################################################

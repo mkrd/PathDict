@@ -132,7 +132,7 @@ def test_referencing():
 	assert p1_shared_dict.data is p2_shared_dict.data
 
 	# Deep copy should have its own value
-	copy = pd(shared_dict).copy()
+	copy = pd(shared_dict).deepcopy()
 	assert copy.get() is not p1_shared_dict.get()
 
 
@@ -195,25 +195,25 @@ def test_set_path():
 
 
 
-def test_copy():
+def test_deepcopy():
 	j = {"1": {"2": 3}}
 
-	assert pd(j).copy().get()     == j
-	assert pd(j).copy().get() is not j
+	assert pd(j).deepcopy().get()     == j
+	assert pd(j).deepcopy().get() is not j
 
 	assert pd(j).at("1").get() is j["1"]
-	assert pd(j).at("1").copy().get() is not j["1"]
+	assert pd(j).at("1").deepcopy().get() is not j["1"]
 
 	print("💽")
-	print(pd(j).at("1").copy())
-	assert pd(j).at("1").copy().get()     == j["1"]
+	print(pd(j).at("1").deepcopy())
+	assert pd(j).at("1").deepcopy().get()     == j["1"]
 
-	assert pd(j).at("1").copy(from_root=True).at().get() == j
+	assert pd(j).at("1").deepcopy(from_root=True).at().get() == j
 
 	# Nested
-	dc_pd = pd(users).copy()
+	dc_pd = pd(users).deepcopy()
 	assert dc_pd.data is not users
-	dc_pd_copy = dc_pd.copy()
+	dc_pd_copy = dc_pd.deepcopy()
 	assert dc_pd is not dc_pd_copy
 
 
@@ -245,7 +245,7 @@ def test_nested_object_copy():
 	o["test", "test"] = TestObject({"1": "2"})
 	assert str(o.get()) == """{'test': {'test': TestObject({'1': '2'})}}"""
 
-	od = o.copy()
+	od = o.deepcopy()
 	# The copy has the same str representation
 	assert str(od.get()) == str(o.get())
 	# It is still a TestObject
@@ -272,7 +272,7 @@ def test_PDHandle_mapped():
 	}
 
 	p = pd(j).at("1/2").mapped(lambda x: x + 1).at().get()
-	p2 = pd(j).copy().at("1/2").map(lambda x: x + 1).at().get()
+	p2 = pd(j).deepcopy().at("1/2").map(lambda x: x + 1).at().get()
 
 
 	assert j["1"]["2"] == 3
@@ -463,7 +463,7 @@ def test_PDMultiHandle_get_all_3():
 def test_PDHandle_filter():
 	users_pd = pd(users)
 
-	users_below_30 = users_pd.copy().at("users").filtered(lambda k, v: v["age"] <= 30)
+	users_below_30 = users_pd.deepcopy().at("users").filtered(lambda k, v: v["age"] <= 30)
 	assert users_below_30.get() == {
 		"1": {
 			"age": 22,
@@ -471,7 +471,7 @@ def test_PDHandle_filter():
 		}
 	}
 
-	premium_users = users_pd.copy().at("users").filtered(lambda k, v: int(k) in users_pd["premium_users"])
+	premium_users = users_pd.deepcopy().at("users").filtered(lambda k, v: int(k) in users_pd["premium_users"])
 	assert premium_users.get() == {
 		"1": {
 			"age": 22,
@@ -555,13 +555,13 @@ def test_star_operations():
 	})
 
 	# Get names of all winners
-	winners = winners_original.copy(from_root=True)
+	winners = winners_original.deepcopy(from_root=True)
 	assert winners.at("*", "podium", "*", "name").gather() == [
 		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
 	]
 
 	# Increment age of all users by 1
-	winners = winners_original.copy(from_root=True)
+	winners = winners_original.deepcopy(from_root=True)
 	winners.at("*/podium/*/age").map(lambda x: x + 1)
 	assert winners["2017", "podium", "17-place-1", "age"] == 23
 	assert winners["2017", "podium", "17-place-2", "age"] == 14
@@ -576,7 +576,7 @@ def test_star_operations():
 
 
 def test_PDHandle_reduce():
-	users_pd = pd(users).copy()
+	users_pd = pd(users).deepcopy()
 
 	users_ages = users_pd.at("users").reduce(lambda k, v, a: a + v["age"], aggregate=0)
 	assert users_ages == 103
@@ -588,7 +588,7 @@ def test_PDHandle_reduce():
 	with pytest.raises(TypeError):
 		p.at("l1").reduce(lambda v, a: a + v, aggregate=0)
 
-	p = pd(users).copy()
+	p = pd(users).deepcopy()
 	assert p.at("users/*/name").reduce(lambda v, a: a + [v], aggregate=[]) == ["Joe", "Ben", "Sue"]
 
 
@@ -639,7 +639,7 @@ def test_scenario_3():
 	# Get sum of all expenses in EUR
 
 
-	assert u.copy(from_root=True).at("*/expenses/*").filter(lambda v: v["currency"] == "EUR").at("*/amount").sum() == 303
+	assert u.deepcopy(from_root=True).at("*/expenses/*").filter(lambda v: v["currency"] == "EUR").at("*/amount").sum() == 303
 
 
 	# Get all transactions in CHF except for those of sue
@@ -689,7 +689,7 @@ def test_PDMultiHandle_set():
 			},
 		},
 	}
-	p = pd(db).copy()
+	p = pd(db).deepcopy()
 	p.at("users/*/friends").set([])
 	p["users/*/blip"] = "blap"
 	assert p["users", "1", "friends"] == []
