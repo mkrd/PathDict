@@ -287,6 +287,8 @@ def test_PDHandle_append():
 	p = pd({})
 	p.at("1/2").append(3)
 	assert p.at().get() == {"1": {"2": [3]}}
+	with pytest.raises(TypeError):
+		p.at("1").append(2)
 
 
 def test_scenario_1():
