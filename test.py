@@ -283,6 +283,12 @@ def test_PDHandle_mapped():
 	assert j["a"] is not p["a"]
 
 
+def test_PDHandle_append():
+	p = pd({})
+	p.at("1/2").append(3)
+	assert p.at().get() == {"1": {"2": [3]}}
+
+
 def test_scenario_1():
 	d = {
 		"total_users": 3,
