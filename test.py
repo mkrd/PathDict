@@ -85,6 +85,8 @@ def test_initialization():
 
 def test_at():
 	assert pd(db).at().path_handle.path == []
+	assert pd(db).at("").path_handle.path == []
+	assert pd(db).at("/").path_handle.path == []
 	assert pd(db).at([]).path_handle.path == []
 	assert pd(db).at("users").path_handle.path == ["users"]
 	assert pd(db).at(["users"]).path_handle.path == ["users"]
@@ -197,23 +199,46 @@ def test_set_path():
 
 def test_deepcopy():
 	j = {"1": {"2": 3}}
+	assert pd(j).at("1").get() is j["1"]
 
+	# deepcopy at root
 	assert pd(j).deepcopy().get()     == j
 	assert pd(j).deepcopy().get() is not j
 
-	assert pd(j).at("1").get() is j["1"]
+	# deepcopy at path
 	assert pd(j).at("1").deepcopy().get() is not j["1"]
-
-	print("💽")
-	print(pd(j).at("1").deepcopy())
 	assert pd(j).at("1").deepcopy().get()     == j["1"]
+	assert pd(j).deepcopy().at("1").get() is not j["1"]
 
+	# deepcopy from root at path
 	assert pd(j).at("1").deepcopy(from_root=True).at().get() == j
+	assert pd(j).at("1").deepcopy(from_root=True).at().get() is not j
+	assert pd(j).at("1").deepcopy(from_root=True).get() == j
 
 	# Nested
 	dc_pd = pd(users).deepcopy()
 	assert dc_pd.data is not users
 	dc_pd_copy = dc_pd.deepcopy()
+	assert dc_pd is not dc_pd_copy
+
+
+def test_copy():
+	j = {"1": {"2": 3}}
+	assert pd(j).at("1").get() is j["1"]
+
+	assert pd(j).copy().get()     == j
+	assert pd(j).copy().get() is not j
+
+	assert pd(j).at("1").copy().get() is not j["1"]
+	assert pd(j).at("1").copy().get()     == j["1"]
+	assert pd(j).copy().at("1").get() is j["1"]
+
+	assert pd(j).at("1").copy(from_root=True).at().get() == j
+
+	# Nested
+	dc_pd = pd(users).copy()
+	assert dc_pd.data is not users
+	dc_pd_copy = dc_pd.copy()
 	assert dc_pd is not dc_pd_copy
 
 
