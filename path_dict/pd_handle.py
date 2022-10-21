@@ -307,6 +307,13 @@ class PDHandle:
 		raise TypeError("PathDict sum: must be applied to a dict or list")
 
 
+	def append(self, value) -> PDHandle:
+		"""
+		Append the value to the list at the given path.
+		"""
+		return self.map(lambda l: (l or []) + [value])
+
+
 	############################################################################
 	#### Standard dict methods
 	############################################################################
