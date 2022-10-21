@@ -156,15 +156,6 @@ def test_get_path():
 	assert users_pd[["follows", 0]] == ["Ben", "Sue"]
 
 
-def test_PDHandle_get_at():
-	j = {"1": {"2": 3}}
-	pd(j).get_at("1/2") == 3
-	pd(j).get_at("1/3/4") is None
-	pd(j).get_at("2") is None
-	with pytest.raises(KeyError):
-		pd(j).get_at("1/2/3")
-
-
 def test_set_path():
 	assert pd(["1", 2]).set([3, "4"]).get() == [3, "4"]
 
@@ -217,7 +208,7 @@ def test_copy():
 	print(pd(j).at("1").copy())
 	assert pd(j).at("1").copy().get()     == j["1"]
 
-	assert pd(j).at("1").copy(from_root=True).get_root() == j
+	assert pd(j).at("1").copy(from_root=True).at().get() == j
 
 	# Nested
 	dc_pd = pd(users).copy()
@@ -280,8 +271,8 @@ def test_PDHandle_mapped():
 		"a": {"b": "c"}
 	}
 
-	p = pd(j).at("1/2").mapped(lambda x: x + 1).get_root()
-	p2 = pd(j).copy().at("1/2").map(lambda x: x + 1).get_root()
+	p = pd(j).at("1/2").mapped(lambda x: x + 1).at().get()
+	p2 = pd(j).copy().at("1/2").map(lambda x: x + 1).at().get()
 
 
 	assert j["1"]["2"] == 3
@@ -506,7 +497,7 @@ def test_PDHandle_filter_behavior_spec():
 
 	assert j == {"a": "b", "1": {"4": "40"}}
 	assert p.get() == {"4": "40"}
-	assert p.get_root() == {"a": "b", "1": {"4": "40"}}
+	assert p.at().get() == {"a": "b", "1": {"4": "40"}}
 
 	with pytest.raises(TypeError):
 		p.at("a").filter(lambda x: x)

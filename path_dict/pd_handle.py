@@ -24,13 +24,12 @@ class PDHandle:
 				f"({data})"
 			)
 
-		self.root_data = data  # The original data that was passed to the first PDHandle
 		self.data = data
 		self.path_handle = path
 
 
 	def __repr__(self) -> str:
-		return f"PDHandle({self.data = }, {self.root_data = }, {self.path_handle = })"
+		return f"PDHandle({self.data = }, {self.path_handle = })"
 
 
 	def copy(self, from_root=False) -> PDHandle:
@@ -82,7 +81,7 @@ class PDHandle:
 		self.path_handle = Path(*path, str_sep=str_sep, raw=raw)
 
 		if self.path_handle.has_wildcards:
-			return PDMultiHandle(self.root_data, self.path_handle)
+			return PDMultiHandle(self.data, self.path_handle)
 		return self
 
 
@@ -152,23 +151,6 @@ class PDHandle:
 			if current is None:
 				return default
 		return current
-
-
-	def get_root(self) -> dict | list:
-		"""
-		Get the original data that was passed to the first PDHandle
-		"""
-		return self.root_data
-
-
-	def get_at(self, *path) -> dict | list | Any:
-		"""
-		Get the value at the given path.
-		"""
-		at = self.at(*path)
-		if self.path_handle.has_wildcards:
-			return at.gather()
-		return at.get()
 
 
 	############################################################################
