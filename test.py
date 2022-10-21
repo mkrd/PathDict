@@ -100,7 +100,7 @@ def test_at_parent():
 
 
 def test_at_children():
-	assert pd(db).at("users").at_children().gather() == [u for u in db["users"].values()]
+	assert pd(db).at("users").at_children().gather() == list(db["users"].values())
 
 
 def test_simple_get():
