@@ -1,4 +1,6 @@
 from path_dict import pd
+from datetime import datetime, timedelta
+
 
 users = {
 	"u1": {
@@ -91,3 +93,33 @@ crawler_output = {
 
 # # PD version remove deleted posts
 # pd.filter("posts", f=lambda x: not x["meta", "deleted"])
+
+
+
+posts = {
+	"p1": {
+		"ts": 1663566212,
+		"title": "Hello World",
+		"meta": {"author": "u1", "deleted": True},
+	},
+	"p2": {
+		"ts": 1666158212,
+		"title": "Hello aswell",
+		"meta": {"author": "u2"},
+	},
+	"p3": {
+		"ts": 1666331012,
+		"title": "Hello again",
+	},
+}
+
+
+last_week = datetime.now() - timedelta(weeks=1)
+pd(posts).at("*/ts").map(lambda ts: datetime.fromtimestamp(ts))
+pd(posts).filter(lambda id, post: post["ts"] > last_week)
+
+
+# print(posts)
+
+# pd(tasks).at(task_id, "annotation/entry_list").append(new_entry)
+# tasks[task_id, "annotation/entry_list"] = lambda el: (el or []) + new_entry
