@@ -2,6 +2,8 @@ from path_dict import pd
 import json
 from pyinstrument.profiler import Profiler
 
+from path_dict.pd_handle import PDHandle
+
 db_directory = "./test_data/production_database"
 
 
@@ -24,13 +26,12 @@ sorted_users_list = sorted(users.values(), key=lambda x: x["first_name"])
 tasks["test", "test"] = TestObject({"test": "test"})
 
 
-def agg(tasks, sorted_users_list):
+def agg(tasks: PDHandle, sorted_users_list):
 	# Get active users
 	total_active_tasks_sum = 0
 	total_pending_tasks_sum = 0
 
 	for user in sorted_users_list:
-		print(user["last_name"])
 		user_active_tasks = tasks.filtered(lambda k, v: v.get("annotator_id") == user["id"] and v["status"] == "assigned_accepted")
 		s = len(user_active_tasks)
 		user["active_tasks_sum"] = s
@@ -42,7 +43,7 @@ def agg(tasks, sorted_users_list):
 		print(user["last_name"], total_active_tasks_sum, total_active_tasks_sum)
 
 
-profiler = Profiler(interval=0.01)
+profiler = Profiler(interval=0.0001)
 profiler.start()
 agg(tasks, sorted_users_list)
 profiler.stop()

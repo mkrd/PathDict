@@ -1,8 +1,30 @@
 from __future__ import annotations
 from typing import Any
+import copy
 
 
-def _safe_list_get(current, key):
+def fast_deepcopy(obj):
+	"""
+	Makes a fast deep copy of the object.
+	dict, list, tuple, set, str, int, float and bool are truly copied.
+	Everything else is just copied by reference.
+
+	:param obj: The object to be copied
+	"""
+	# Fast exit for immutable types
+	if isinstance(obj, (int, str, bool, float)):
+		return obj
+	# Copy key and value for dicts
+	if isinstance(obj, dict):
+		return {fast_deepcopy(k): fast_deepcopy(v) for k, v in obj.items()}
+	# Copy all other supported types
+	if (t := type(obj)) in (list, tuple, set):
+		return t(fast_deepcopy(v) for v in obj)
+	# Everything else is copied by reference
+	return obj
+
+
+def safe_list_get(current, key):
 	try:
 		return current[int(key)]
 	except (ValueError, IndexError) as e:
@@ -21,7 +43,7 @@ def guarded_get(current: dict | list, key: Any):
 	if isinstance(current, dict):
 		return None if key not in current else current[key]
 	if isinstance(current, list):
-		return _safe_list_get(current, key)
+		return safe_list_get(current, key)
 	raise KeyError(
 		f"PathDict: The path is not a stack of nested dicts and lists "
 		f"(value at key {key} has type {type(current)})"
@@ -37,7 +59,7 @@ def guarded_descent(current, key):
 		current.setdefault(key, {})
 		return current[key]
 	if isinstance(current, list):
-		return _safe_list_get(current, key)
+		return safe_list_get(current, key)
 	raise KeyError("Can't set the key of a non-dict")
 
 

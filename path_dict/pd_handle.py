@@ -32,19 +32,21 @@ class PDHandle:
 		return f"PDHandle({self.data = }, {self.path_handle = })"
 
 
-	def deepcopy(self, from_root=False) -> PDHandle:
+	def deepcopy(self, from_root=False, true_deepcopy=False) -> PDHandle:
 		"""
 		Return a deep copy of the data at the current path or from the root.
 
 		Args:
 		- `from_root` - If `True`, the copy will not be made at the root data, and not where the current path is. The path handle be moved to the root. If `False`, only the part of the data where the current path handle is at will be copied.
+		- `true_deepcopy` - If True, the copy will be made using `copy.deepcopy`. If False, the copy recusively copy dicts, lists, tuples and sets, but will not copy other types of objects.
 
 		Returns:
 		- A handle on the newly created copy
 		"""
-		path = self.path_handle.deepcopy(path=[])
-		copied_data = copy.deepcopy(self.data if from_root else self.get())
-		return PDHandle(copied_data, path)
+		path = self.path_handle.copy(replace_path=[])
+		data = self.data if from_root else self.get()
+		data_copy = copy.deepcopy(data) if true_deepcopy else utils.fast_deepcopy(data)
+		return PDHandle(data_copy, path)
 
 
 	def copy(self, from_root=False) -> PDHandle:
@@ -57,9 +59,9 @@ class PDHandle:
 		Returns:
 		- A handle on the newly created copy
 		"""
-		path = self.path_handle.deepcopy(path=[])
-		copied_data = copy.copy(self.data if from_root else self.get())
-		return PDHandle(copied_data, path)
+		path = self.path_handle.copy(replace_path=[])
+		data_copy = copy.copy(self.data if from_root else self.get())
+		return PDHandle(data_copy, path)
 
 
 	############################################################################
@@ -223,11 +225,11 @@ class PDHandle:
 
 	def mapped(self, f: Callable) -> PDHandle:
 		"""
-		Makes a copy of your root data, moves the handle to the previously
+		Makes a fast deepcopy of your root data, moves the handle to the previously
 		set path, applies map with f at that path, and returns the handle.
 		"""
 		current_handle = self.path_handle
-		return self.at().deepcopy().at(current_handle.path).map(f)
+		return self.deepcopy(from_root=True).at(current_handle.path).map(f)
 
 
 	############################################################################
@@ -255,10 +257,7 @@ class PDHandle:
 		Shortcut for:
 		>>> copy().filter(f)
 		"""
-		# TODO: Deepcopy is super slow. Find a way to do this without it.
-		# raise NotImplementedError("TODO")
-
-		return self.deepcopy().filter(f)
+		return self.copy().filter(f)
 
 
 	############################################################################
@@ -317,20 +316,20 @@ class PDHandle:
 	############################################################################
 
 
-	# def keys(self):
-	# 	return self.data.keys()
+	def keys(self):
+		return self.get().keys()
 
 
-	# def values(self):
-	# 	return self.data.values()
+	def values(self):
+		return self.get().values()
 
 
-	# def items(self):
-	# 	return self.data.items()
+	def items(self):
+		return self.get().items()
 
 
-	# def __iter__(self):
-	# 	return iter(self.data)
+	def __len__(self):
+		return len(self.get())
 
 
 	def __getitem__(self, path):

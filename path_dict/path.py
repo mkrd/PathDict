@@ -60,11 +60,10 @@ class Path:
 		return self.path[key]
 
 
-
-	def deepcopy(self, path=None, str_sep=None, raw=None) -> Path:
-		path_copy = copy.deepcopy(self.path) if path is None else path
-		str_sep_copy = str(self.str_sep) if str_sep is None else str_sep
-		raw_copy = self.raw if raw is None else raw
+	def copy(self, replace_path=None, replace_str_sep=None, replace_raw=None) -> Path:
+		path_copy = list(self.path) if replace_path is None else replace_path
+		str_sep_copy = str(self.str_sep) if replace_str_sep is None else replace_str_sep
+		raw_copy = self.raw if replace_raw is None else replace_raw
 		return Path(path_copy, str_sep=str_sep_copy, raw=raw_copy)
 
 

@@ -279,13 +279,25 @@ def test_nested_object_copy():
 	o["test", "test"] = TestObject({"1": "2"})
 	assert str(o.get()) == """{'test': {'test': TestObject({'1': '2'})}}"""
 
-	od = o.deepcopy()
+	# True deepcopy
+	tdc = o.deepcopy(true_deepcopy=True)
 	# The copy has the same str representation
-	assert str(od.get()) == str(o.get())
+	assert str(tdc.get()) == str(o.get())
 	# It is still a TestObject
-	assert type(od.at("test", "test").get()) == TestObject
+	assert type(tdc.at("test", "test").get()) == TestObject
 	# But not the same object
-	assert od.at("test", "test").get() is not o.at("test", "test").get()
+	assert tdc.at("test").get() is not o.at("test").get()
+	assert tdc.at("test", "test").get() is not o.at("test", "test").get()
+
+	# Fast deepcopy
+	fdc = o.at().deepcopy()
+	# The copy has the same str representation
+	assert str(fdc.get()) == str(o.get())
+	# It is still a TestObject
+	assert type(fdc.at("test", "test").get()) == TestObject
+	# But not the same object
+	assert fdc.at("test").get() is not o.at("test").get()
+	assert fdc.at("test", "test").get() is o.at("test", "test").get()
 
 
 def test_PDHandle_map():
