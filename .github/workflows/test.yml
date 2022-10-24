@@ -32,7 +32,7 @@ jobs:
       #---- Tests
       #----------------------------------------------
 
-      - name: Run tests with code coverage report
+      - name: 🚀 Run tests with code coverage report
         run: poetry run pytest --cov=path_dict --cov-report term-missing
 
       #----------------------------------------------
