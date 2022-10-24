@@ -61,7 +61,7 @@ jobs:
         with:
           name: coverage
 
-      - name: Generate Coverage Badge
+      - name: GenerateCoverage Badge
         uses: tj-actions/coverage-badge-py@v1.8
         with:
           output: assets/coverage.svg
