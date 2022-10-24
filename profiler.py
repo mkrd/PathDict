@@ -18,29 +18,24 @@ class TestObject(object):
 users = pd(json.loads(open(f"{db_directory}/users.json", "r").read()))
 tasks = pd(json.loads(open(f"{db_directory}/tasks.json", "r").read()))
 
-print(f"{len(users)} users, {len(tasks)} tasks")
 
 users.filter(f=lambda k, v: v.get("status") != "archived")
 sorted_users_list = sorted(users.values(), key=lambda x: x["first_name"])
 
+print(f"{len(users)} users, {len(tasks)} tasks")
 tasks["test", "test"] = TestObject({"test": "test"})
 
 
 def agg(tasks: PDHandle, sorted_users_list):
 	# Get active users
-	total_active_tasks_sum = 0
-	total_pending_tasks_sum = 0
-
 	for user in sorted_users_list:
 		user_active_tasks = tasks.filtered(lambda k, v: v.get("annotator_id") == user["id"] and v["status"] == "assigned_accepted")
 		s = len(user_active_tasks)
 		user["active_tasks_sum"] = s
-		total_active_tasks_sum += s
 		user_pending_tasks = tasks.filtered(lambda k, v: v.get("annotator_id") == user["id"] and v["status"] == "assigned_pending")
 		s = len(user_pending_tasks)
 		user["pending_tasks_sum"] = s
-		total_pending_tasks_sum += s
-		print(user["last_name"], total_active_tasks_sum, total_active_tasks_sum)
+		print(user["last_name"], user["active_tasks_sum"], user["pending_tasks_sum"])
 
 
 profiler = Profiler(interval=0.0001)

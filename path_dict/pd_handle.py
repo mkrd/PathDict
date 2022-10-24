@@ -317,11 +317,11 @@ class PDHandle:
 
 
 	def keys(self):
-		return self.get().keys()
+		return list(self.get().keys())
 
 
 	def values(self):
-		return self.get().values()
+		return list(self.get().values())
 
 
 	def items(self):

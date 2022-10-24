@@ -337,6 +337,38 @@ def test_PDHandle_append():
 		p.at("1").append(2)
 
 
+def test_PDHandle_keys():
+	p = pd({"1": {"2": [3]}})
+	assert p.keys() == ["1"]
+	assert p.at("1").keys() == ["2"]
+	with pytest.raises(AttributeError):
+		p.at("1/2").keys()
+
+
+def test_PDHandle_values():
+	p = pd({"1": {"2": [3]}})
+	assert p.values() == [{"2": [3]}]
+	assert p.at("1").values() == [[3]]
+	with pytest.raises(AttributeError):
+		p.at("1/2").values()
+
+
+def test_PDHandle_items():
+	p = pd({"1": {"2": [3]}})
+	assert list(p.items()) == [("1", {"2": [3]})]
+	assert list(p.at("1").items()) == [("2", [3])]
+	with pytest.raises(AttributeError):
+		p.at("1/2").items()
+
+
+def test_PDHandle__len__():
+	p = pd({"1": {"2": [3, 1]}})
+	assert len(p) == 1
+	assert len(p.at("1")) == 1
+	assert len(p.at("1/2")) == 2
+
+
+
 def test_scenario_1():
 	d = {
 		"total_users": 3,
