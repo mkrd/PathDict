@@ -138,6 +138,11 @@ def test_referencing():
 	assert copy.get() is not p1_shared_dict.get()
 
 
+def test_repr():
+	j = {"1": 2}
+	assert str(pd(j)) == "PDHandle(self.data = {'1': 2}, self.path_handle = Path(path=[], str_sep=/, raw=False))"
+
+
 def test_get_path():
 	users_dict = copy.deepcopy(users)
 	users_pd = pd(users_dict)
@@ -156,6 +161,10 @@ def test_get_path():
 		print(users_pd["follows", "not_correct"])
 	# Get at list
 	assert users_pd[["follows", 0]] == ["Ben", "Sue"]
+
+	assert users_pd["users", "1", "*"] == ["Joe", 22]
+
+
 
 
 def test_set_path():

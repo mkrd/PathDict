@@ -255,6 +255,8 @@ class PDHandle:
 		Shortcut for:
 		>>> copy().filter(f)
 		"""
+		# TODO: Deepcopy is super slow. Find a way to do this without it.
+		# raise NotImplementedError("TODO")
 
 		return self.deepcopy().filter(f)
 
@@ -333,7 +335,7 @@ class PDHandle:
 
 	def __getitem__(self, path):
 		at = self.at(*path) if isinstance(path, tuple) else self.at(path)
-		if self.path_handle.has_wildcards:
+		if isinstance(at, PDMultiHandle):
 			return at.gather()
 		res = at.get()
 		self.at_root()
