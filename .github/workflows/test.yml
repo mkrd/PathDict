@@ -73,5 +73,8 @@ jobs:
           git add assets/coverage.svg
           git commit -m "Updated assets/coverage.svg"
 
-      - name: Push changes ${{ github.ref }}
-        run: git push -u origin
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          branch: ${{ github.ref }}
