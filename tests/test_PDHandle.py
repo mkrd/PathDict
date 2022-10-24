@@ -306,9 +306,39 @@ def test_filter_behavior_spec():
 
 
 
+def test_filter():
+	users_pd = pd(dummy_data.get_users())
+
+	users_below_30 = users_pd.deepcopy().at("users").filtered(lambda k, v: v["age"] <= 30)
+	assert users_below_30.get() == {
+		"1": {
+			"age": 22,
+			"name": "Joe"
+		}
+	}
+
+	premium_users = users_pd.deepcopy().at("users").filtered(lambda k, v: int(k) in users_pd["premium_users"])
+	assert premium_users.get() == {
+		"1": {
+			"age": 22,
+			"name": "Joe"
+		},
+		"3": {
+			"age": 32,
+			"name": "Sue"
+		}
+	}
+
+	follows_includes_joe = users_pd.at("follows").filtered(lambda e: "Joe" in e)
+	assert isinstance(follows_includes_joe.get(), list)
+	assert follows_includes_joe.get() == [
+		["Joe", "Ben"],
+		["Ben", "Joe"],
+	]
 
 
-def test_PDHandle_reduce():
+
+def test_reduce():
 	users_pd = pd(dummy_data.get_users())
 
 	users_ages = users_pd.at("users").reduce(lambda k, v, a: a + v["age"], aggregate=0)
@@ -323,18 +353,6 @@ def test_PDHandle_reduce():
 
 	p = pd(dummy_data.get_users())
 	assert p.at("users/*/name").reduce(lambda v, a: a + [v], aggregate=[]) == ["Joe", "Ben", "Sue"]
-
-
-def test_PDMultiHandle_sum():
-	p = pd({
-		"1": {"a": 1, "b": [1]},
-		"2": {"a": 3, "b": [1]},
-	})
-	assert p.at("*/a").sum() == 4
-	with pytest.raises(TypeError):
-		p.at("*/b").sum()
-
-
 
 
 def test_keys():
