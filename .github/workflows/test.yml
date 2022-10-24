@@ -33,7 +33,7 @@ jobs:
       #----------------------------------------------
 
       - name: Run tests with code coverage report
-        run: poetry run pytest --cov=path_dict tests --cov-report term-missing
+        run: ./cli -t
 
       #----------------------------------------------
       #---- Save coverage artifact
