@@ -10,13 +10,12 @@ while [[ $# -gt 0 ]]; do case $1 in
 
   --profiler|-p)
     poetry run python profiler.py
-    rm ./profiling.prof
     shift ;;
 
 
   *|-*|--*)
     echo "Unknown option $1"
-    echo "Usage: [ -t | --test ]"
+    echo "Usage: [ -t | --test ] [ -p | --profiler ]"
     exit 2
     exit 1 ;;
 
