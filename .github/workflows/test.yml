@@ -56,21 +56,15 @@ jobs:
       #----------------------------------------------
       - name: ls-lah
         run: ls -lah
+
       - uses: actions/download-artifact@v3
         with:
           name: coverage
 
-
-      - name: Coverage Badge
+      - name: GenerateCoverage Badge
         uses: tj-actions/coverage-badge-py@v1.8
-          with:
-            output: assets/coverage.svg
-
-      - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v11.1
-        id: changed_files
         with:
-          files: assets/coverage.svg
+          output: assets/coverage.svg
 
       - name: Commit files
         if: steps.changed_files.outputs.files_changed == 'true'
