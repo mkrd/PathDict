@@ -33,7 +33,7 @@ jobs:
       #----------------------------------------------
 
       - name: Run tests with code coverage report
-        run: ./cli.sh -t
+        run: sh ./cli.sh -t
 
       #----------------------------------------------
       #---- Save coverage artifact
