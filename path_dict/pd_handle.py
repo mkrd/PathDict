@@ -311,6 +311,13 @@ class PDHandle:
 		return self.map(lambda l: (l or []) + [value])
 
 
+	def update(self, value) -> PDHandle:
+		"""
+		Update the dict at the given path with the given value.
+		"""
+		return self.map(lambda d: {**d, **value})
+
+
 	############################################################################
 	#### Standard dict methods
 	############################################################################

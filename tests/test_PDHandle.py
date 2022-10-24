@@ -279,7 +279,10 @@ def test_append():
 		p.at("1").append(2)
 
 
-
+def test_update():
+	p = pd({"a": 1})
+	p.update({"b": 2, "a": 2})
+	assert p.get() == {"a": 2, "b": 2}
 
 
 def test_filter_behavior_spec():
