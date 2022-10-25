@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
 
   # JOB
-  test-cov:
+  tests-job:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,8 +46,8 @@ jobs:
 
 
   # JOB
-  cov-badge:
-    needs: test-cov
+  cov-badge-job:
+    needs: tests-job
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
