@@ -2,7 +2,7 @@ from path_dict import pd
 import json
 from pyinstrument.profiler import Profiler
 
-from path_dict.pd_handle import PathDict
+from path_dict.path_dict import PathDict
 
 db_directory = "./test_data/production_database"
 

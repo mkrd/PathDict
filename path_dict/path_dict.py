@@ -371,4 +371,4 @@ class PathDict:
 
 
 # Import MultiPathDict at the end of the file to avoid circular imports
-from . pd_multi_handle import MultiPathDict
+from .multi_path_dict import MultiPathDict

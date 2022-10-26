@@ -1,5 +1,5 @@
 from __future__ import annotations
-from . pd_handle import PathDict
+from . path_dict import PathDict
 
 
 pd = PathDict

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any, Callable
 from . path import Path
-from . pd_handle import PathDict
+from . path_dict import PathDict
 
 
 class MultiPathDict:
