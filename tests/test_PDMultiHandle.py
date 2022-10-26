@@ -170,7 +170,7 @@ def test_sum():
 
 def test__repr__():
 	p = pd({})
-	assert str(p.at("*")) == "PDMultiHandle(self.root_data = {}, self.path_handle = Path(path=['*'], str_sep=/, raw=False))"
+	assert str(p.at("*")) == "MultiPathDict(self.root_data = {}, self.path_handle = Path(path=['*'], str_sep=/, raw=False))"
 
 
 def test_set():

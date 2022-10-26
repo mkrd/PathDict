@@ -1,8 +1,8 @@
 from __future__ import annotations
-from . pd_handle import PDHandle
+from . pd_handle import PathDict
 
 
-pd = PDHandle
+pd = PathDict
 
 
 ################################################################################
@@ -26,5 +26,5 @@ pd = PDHandle
 # For the .do_something() after .at(), we need to tell the do_something() method
 # what the path is and wheater or not it is a wildcard path.
 
-# If .at(path) has wildcards, then we really need a PDMultiHandle
-# After the .do_something(), a regular PDHandle will be returned, at its previous path
+# If .at(path) has wildcards, then we really need a MultiPathDict
+# After the .do_something(), a regular PathDict will be returned, at its previous path

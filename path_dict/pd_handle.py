@@ -5,7 +5,7 @@ from . import utils
 from . path import Path
 
 
-class PDHandle:
+class PathDict:
 	root_data: dict | list | Any
 	data:      dict | list | Any
 	path_handle: Path
@@ -13,7 +13,7 @@ class PDHandle:
 
 	def __init__(self, data: dict | list, str_sep="/", raw=False, path: Path = None):
 		"""
-		A PDHandle always refers to a dict or list.
+		A PathDict always refers to a dict or list.
 		It is used to get data or perform operations at a given path.
 		When initialized, the current path is the root path.
 		"""
@@ -27,10 +27,10 @@ class PDHandle:
 
 
 	@classmethod
-	def from_data_and_path(cls, data: dict | list, path: Path) -> PDHandle:
+	def from_data_and_path(cls, data: dict | list, path: Path) -> PathDict:
 		"""
-		Alternative constructor for PDHandle.
-		A PDHandle always refers to a dict or list.
+		Alternative constructor for PathDict.
+		A PathDict always refers to a dict or list.
 		It is used to get data or perform operations at a given path.
 		When initialized, the current path is the root path.
 		"""
@@ -38,10 +38,10 @@ class PDHandle:
 
 
 	def __repr__(self) -> str:
-		return f"PDHandle({self.data = }, {self.path_handle = })"
+		return f"PathDict({self.data = }, {self.path_handle = })"
 
 
-	def deepcopy(self, from_root=False, true_deepcopy=False) -> PDHandle:
+	def deepcopy(self, from_root=False, true_deepcopy=False) -> PathDict:
 		"""
 		Return a deep copy of the data at the current path or from the root.
 
@@ -55,10 +55,10 @@ class PDHandle:
 		path = self.path_handle.copy(replace_path=[])
 		data = self.data if from_root else self.get()
 		data_copy = copy.deepcopy(data) if true_deepcopy else utils.fast_deepcopy(data)
-		return PDHandle.from_data_and_path(data_copy, path)
+		return PathDict.from_data_and_path(data_copy, path)
 
 
-	def copy(self, from_root=False) -> PDHandle:
+	def copy(self, from_root=False) -> PathDict:
 		"""
 		Return a shallow copy of the data at the current path or from the root.
 
@@ -70,7 +70,7 @@ class PDHandle:
 		"""
 		path = self.path_handle.copy(replace_path=[])
 		data_copy = copy.copy(self.data if from_root else self.get())
-		return PDHandle.from_data_and_path(data_copy, path)
+		return PathDict.from_data_and_path(data_copy, path)
 
 
 	############################################################################
@@ -78,7 +78,7 @@ class PDHandle:
 	############################################################################
 
 
-	def at(self, *path, str_sep=None, raw=None) -> PDHandle | PDMultiHandle:
+	def at(self, *path, str_sep=None, raw=None) -> PathDict | MultiPathDict:
 		"""
 		Calling at(path) moves the handle to the given path, and returns the
 		handle.
@@ -92,7 +92,7 @@ class PDHandle:
 
 		The path can also contain wildcards (*) to select everything at a given
 		level, and [a|b|c] to select multiple keys at a given level.
-		In this case, the result is a PDMultiHandle, which can perform
+		In this case, the result is a MultiPathDict, which can perform
 		operations on all the selected elements at once.
 
 		:param path: The path to move to.
@@ -106,15 +106,15 @@ class PDHandle:
 		self.path_handle = Path(*path, str_sep=str_sep, raw=raw)
 
 		if self.path_handle.has_wildcards:
-			return PDMultiHandle(self.data, self.path_handle)
+			return MultiPathDict(self.data, self.path_handle)
 		return self
 
 
-	def at_root(self) -> PDHandle:
+	def at_root(self) -> PathDict:
 		"""
 		Move the handle back to the root of the data and return it.
 		Equivalent to
-		>>> <PDHandle>.at()
+		>>> <PathDict>.at()
 
 		Useful if you are in a nested handle but also want to do something on the root data.
 
@@ -125,16 +125,16 @@ class PDHandle:
 		return self.at()
 
 
-	def at_parent(self) -> PDHandle:
+	def at_parent(self) -> PathDict:
 		"""
 		Move the handle to the parent of the current path and return it.
 		"""
 		return self.at(self.path_handle.path[:-1])
 
 
-	def at_children(self) -> PDMultiHandle:
+	def at_children(self) -> MultiPathDict:
 		"""
-		Return a PDMultiHandle that refers to all the children of the current
+		Return a MultiPathDict that refers to all the children of the current
 		path.
 		"""
 		return self.at(self.path_handle.path + ["*"])
@@ -184,7 +184,7 @@ class PDHandle:
 	############################################################################
 
 
-	def set(self, value) -> PDHandle:
+	def set(self, value) -> PathDict:
 		# Setting nothing is a no-op
 		if value is None:
 			return self
@@ -222,7 +222,7 @@ class PDHandle:
 		return self
 
 
-	def map(self, f: Callable) -> PDHandle:
+	def map(self, f: Callable) -> PathDict:
 		"""
 		Map the result of f to the value at path previously set by ".at(path)".
 
@@ -232,7 +232,7 @@ class PDHandle:
 		return self
 
 
-	def mapped(self, f: Callable) -> PDHandle:
+	def mapped(self, f: Callable) -> PathDict:
 		"""
 		Makes a fast deepcopy of your root data, moves the handle to the previously
 		set path, applies map with f at that path, and returns the handle.
@@ -247,7 +247,7 @@ class PDHandle:
 	############################################################################
 
 
-	def filter(self, f: Callable) -> PDHandle:
+	def filter(self, f: Callable) -> PathDict:
 		"""
 		At the current path only keep the elements for which f(key, value)
 		is True for dicts, or f(value) is True for lists.
@@ -261,7 +261,7 @@ class PDHandle:
 
 
 
-	def filtered(self, f: Callable) -> PDHandle:
+	def filtered(self, f: Callable) -> PathDict:
 		"""
 		Shortcut for:
 		>>> copy().filter(f)
@@ -313,14 +313,14 @@ class PDHandle:
 		raise TypeError("PathDict sum: must be applied to a dict or list")
 
 
-	def append(self, value) -> PDHandle:
+	def append(self, value) -> PathDict:
 		"""
 		Append the value to the list at the given path.
 		"""
 		return self.map(lambda l: (l or []) + [value])
 
 
-	def update(self, value) -> PDHandle:
+	def update(self, value) -> PathDict:
 		"""
 		Update the dict at the given path with the given value.
 		"""
@@ -350,7 +350,7 @@ class PDHandle:
 
 	def __getitem__(self, path):
 		at = self.at(*path) if isinstance(path, tuple) else self.at(path)
-		if isinstance(at, PDMultiHandle):
+		if isinstance(at, MultiPathDict):
 			return at.gather()
 		res = at.get()
 		self.at_root()
@@ -370,5 +370,5 @@ class PDHandle:
 			return False
 
 
-# Import PDMultiHandle at the end of the file to avoid circular imports
-from . pd_multi_handle import PDMultiHandle
+# Import MultiPathDict at the end of the file to avoid circular imports
+from . pd_multi_handle import MultiPathDict

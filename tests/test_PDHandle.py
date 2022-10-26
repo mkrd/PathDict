@@ -85,7 +85,7 @@ def test_referencing():
 
 def test__repr__():
 	j = {"1": 2}
-	assert str(pd(j)) == "PDHandle(self.data = {'1': 2}, self.path_handle = Path(path=[], str_sep=/, raw=False))"
+	assert str(pd(j)) == "PathDict(self.data = {'1': 2}, self.path_handle = Path(path=[], str_sep=/, raw=False))"
 
 
 

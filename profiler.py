@@ -2,7 +2,7 @@ from path_dict import pd
 import json
 from pyinstrument.profiler import Profiler
 
-from path_dict.pd_handle import PDHandle
+from path_dict.pd_handle import PathDict
 
 db_directory = "./test_data/production_database"
 
@@ -26,7 +26,7 @@ print(f"{len(users)} users, {len(tasks)} tasks")
 tasks["test", "test"] = TestObject({"test": "test"})
 
 
-def agg(tasks: PDHandle, sorted_users_list):
+def agg(tasks: PathDict, sorted_users_list):
 	# Get active users
 	for user in sorted_users_list:
 		user_active_tasks = tasks.filtered(lambda k, v: v.get("annotator_id") == user["id"] and v["status"] == "assigned_accepted")

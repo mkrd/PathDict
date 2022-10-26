@@ -296,7 +296,7 @@ If you try to serialize a PathDict object itself, the operation will fail.
 # Reference
 
 
-### pd(data: dict | list, str_sep="/", raw=False) -> PDHandle
+### pd(data: dict | list, str_sep="/", raw=False) -> PathDict
 
 Creates and returns a handle on the given data.
 
@@ -309,9 +309,9 @@ Returns:
 - A handle that references the root of the given data dict or list.
 
 
-## PDHandle
+## PathDict
 
-### copy(self, from_root=False) -> PDHandle
+### copy(self, from_root=False) -> PathDict
 
 Return a deep copy of the data at the current path or from the root.
 
