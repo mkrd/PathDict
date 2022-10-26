@@ -365,7 +365,9 @@ class PathDict:
 
 	def __contains__(self, *path):
 		try:
-			return self.at(*path).get() is not None
+			contains = self.at(*path).get() is not None
+			self.at_root()
+			return contains
 		except KeyError:
 			return False
 
