@@ -11,21 +11,30 @@ class PDHandle:
 	path_handle: Path
 
 
-	def __init__(self, data: dict | list, path: Path) -> None:
+	def __init__(self, data: dict | list, str_sep="/", raw=False, path: Path = None):
 		"""
 		A PDHandle always refers to a dict or list.
 		It is used to get data or perform operations at a given path.
 		When initialized, the current path is the root path.
 		"""
-
 		if not isinstance(data, (dict, list)):
 			raise TypeError(
 				f"PathDict init: data must be dict or list but is {type(data)} "
 				f"({data})"
 			)
-
 		self.data = data
-		self.path_handle = path
+		self.path_handle = Path([], str_sep=str_sep, raw=raw) if path is None else path
+
+
+	@classmethod
+	def from_data_and_path(cls, data: dict | list, path: Path) -> PDHandle:
+		"""
+		Alternative constructor for PDHandle.
+		A PDHandle always refers to a dict or list.
+		It is used to get data or perform operations at a given path.
+		When initialized, the current path is the root path.
+		"""
+		return cls(data=data, path=path)
 
 
 	def __repr__(self) -> str:
@@ -46,7 +55,7 @@ class PDHandle:
 		path = self.path_handle.copy(replace_path=[])
 		data = self.data if from_root else self.get()
 		data_copy = copy.deepcopy(data) if true_deepcopy else utils.fast_deepcopy(data)
-		return PDHandle(data_copy, path)
+		return PDHandle.from_data_and_path(data_copy, path)
 
 
 	def copy(self, from_root=False) -> PDHandle:
@@ -61,7 +70,7 @@ class PDHandle:
 		"""
 		path = self.path_handle.copy(replace_path=[])
 		data_copy = copy.copy(self.data if from_root else self.get())
-		return PDHandle(data_copy, path)
+		return PDHandle.from_data_and_path(data_copy, path)
 
 
 	############################################################################

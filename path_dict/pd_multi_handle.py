@@ -36,7 +36,7 @@ class PDMultiHandle:
 		if as_type not in ["list", "dict"]:
 			raise ValueError("Can only return as dict or list, not both")
 
-		handle = PDHandle(self.root_data, self.path_handle)
+		handle = PDHandle.from_data_and_path(self.root_data, self.path_handle)
 		if as_type == "list":
 			res = []
 			for path in self.path_handle.expand(self.root_data):
@@ -52,7 +52,7 @@ class PDMultiHandle:
 
 	def gather_pd(self, as_type="list", include_paths=False) -> PDHandle:
 		data = self.gather(as_type=as_type, include_paths=include_paths)
-		return PDHandle(data, self.path_handle.copy(replace_path=[]))
+		return PDHandle.from_data_and_path(data, self.path_handle.copy(replace_path=[]))
 
 	############################################################################
 	# Setters
@@ -67,8 +67,8 @@ class PDMultiHandle:
 		:return: The handle itself for further operations.
 		"""
 		for path in self.path_handle.expand(self.root_data):
-			PDHandle(self.root_data, path).map(f)
-		return PDHandle(self.root_data, self.path_handle)
+			PDHandle.from_data_and_path(self.root_data, path).map(f)
+		return PDHandle.from_data_and_path(self.root_data, self.path_handle)
 
 
 	def reduce(self, f: Callable, aggregate: Any, as_type="list", include_paths=False) -> Any:
@@ -109,7 +109,7 @@ class PDMultiHandle:
 
 	def set(self, value: Any) -> PDHandle:
 		for path in self.path_handle.expand(self.root_data):
-			PDHandle(self.root_data, path).set(value)
+			PDHandle.from_data_and_path(self.root_data, path).set(value)
 		return self
 
 
