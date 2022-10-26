@@ -88,6 +88,11 @@ def test__repr__():
 	assert str(pd(j)) == "PathDict(self.data = {'1': 2}, self.path_handle = Path(path=[], str_sep=/, raw=False))"
 
 
+def test_reset_at_after_in():
+	j = {"1": {"2": 3}}
+	p = pd(j)
+	assert "1" in p
+	assert p.get() == j
 
 
 def test_deepcopy():
