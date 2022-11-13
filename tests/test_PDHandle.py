@@ -389,3 +389,11 @@ def test__len__():
 	assert len(p) == 1
 	assert len(p.at("1")) == 1
 	assert len(p.at("1/2")) == 2
+
+
+def test_pop():
+	p = pd({"1": {"2": [3, 1]}, "4": 4})
+	assert p.pop("1") == {"2": [3, 1]}
+	assert p.get() == {"4": 4}
+	assert p.pop("1") is None
+	assert p.pop("1", 2) == 2
