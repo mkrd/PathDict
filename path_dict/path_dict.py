@@ -343,6 +343,8 @@ class PathDict:
 	def items(self):
 		return self.get().items()
 
+	def pop(self, key, default=None):
+		return self.get().pop(key, default)
 
 	def __len__(self):
 		return len(self.get())
