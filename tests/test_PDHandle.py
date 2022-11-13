@@ -397,3 +397,13 @@ def test_pop():
 	assert p.get() == {"4": 4}
 	assert p.pop("1") is None
 	assert p.pop("1", 2) == 2
+
+
+def test_iter():
+
+	p = pd({"a": 1, "b": 2, "c": 3})
+
+	keys = []
+	for k in p:
+		keys.append(k)
+	assert keys == ["a", "b", "c"]

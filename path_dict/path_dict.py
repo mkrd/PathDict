@@ -374,5 +374,9 @@ class PathDict:
 			return False
 
 
+	def __iter__(self):
+		return iter(self.keys())
+
+
 # Import MultiPathDict at the end of the file to avoid circular imports
 from .multi_path_dict import MultiPathDict
