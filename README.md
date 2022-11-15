@@ -1,11 +1,11 @@
 
-![Logo](https://github.com/mkrd/PathDict/blob/master/assets/logo.png?raw=true)
+![Logo](https://github.com/mkrd/PathDict/blob/main/assets/logo.png?raw=true)
 
 [![Total Downloads](https://pepy.tech/badge/path-dict)](https://pepy.tech/project/path-dict)
 [![Monthly Downloads](https://pepy.tech/badge/path-dict/month)](https://pepy.tech/project/path-dict)
 [![Weekly Downloads](https://pepy.tech/badge/path-dict/week)](https://pepy.tech/project/path-dict)
 ![Tests](https://github.com/mkrd/PathDict/actions/workflows/test.yml/badge.svg)
-![Coverage](https://github.com/mkrd/PathDict/blob/master/assets/coverage.svg?raw=1)
+![Coverage](https://github.com/mkrd/PathDict/blob/main/assets/coverage.svg?raw=1)
 
 
 Why do I need this?
