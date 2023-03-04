@@ -19,8 +19,8 @@ classifiers=[
 python = "^3.8"
 
 [tool.poetry.group.dev.dependencies]
-pycodestyle = "^2.8.0"
-black = "^22.10.0"
+pycodestyle = "^2.10.0"
+black = "^23.1.0"
 pytest-cov = "^4.0.0"
 pyinstrument = "^4.3.0"
 
