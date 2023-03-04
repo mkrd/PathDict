@@ -1,9 +1,6 @@
-from __future__ import annotations
 from . path_dict import PathDict
 
-
 pd = PathDict
-
 
 ################################################################################
 # To be used like this:

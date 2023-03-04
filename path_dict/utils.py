@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any
-import copy
 
 
 def fast_deepcopy(obj):
