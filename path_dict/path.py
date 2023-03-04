@@ -84,5 +84,6 @@ class Path:
 				paths = [p + [k] for p in paths for k in get_nested_keys_or_indices(ref, p)]
 
 		# Return empty list if no paths were found
-		paths = paths if paths != [[]] else []
-		return [Path(path, str_sep=self.str_sep, raw=self.raw) for path in paths]
+		if paths == [[]]:
+			return []
+		return [Path(p, str_sep=self.str_sep, raw=self.raw) for p in paths]
