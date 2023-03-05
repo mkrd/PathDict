@@ -19,8 +19,7 @@ class Path:
 			# If the path is a list, then we are good to go
 			self.path = path[0]
 		else:
-			# In raw mode, a tuple is considered a key
-			self.path = [path] if raw else list(path)
+			self.path = list(path)
 
 
 		# If the contains strings with str_sep, split them up if not in raw mode
