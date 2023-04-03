@@ -4,13 +4,11 @@ from . utils import get_nested_keys_or_indices
 
 class Path:
 	path: list[str]
-	str_sep: str
 	raw: bool
 
 
-	def __init__(self, *path, str_sep="/", raw=False):
+	def __init__(self, *path, raw=False):
 		# Careful, if the kwargs are passed as positional agrs, they are part of the path
-		self.str_sep = str_sep
 		self.raw = raw
 
 		# path is, whitout exceptions, always a tuple
@@ -21,23 +19,12 @@ class Path:
 		else:
 			self.path = list(path)
 
-
-		# If the contains strings with str_sep, split them up if not in raw mode
-		if not self.raw:
-			new_path = []
-			for key in self.path:
-				if isinstance(key, str) and str_sep in key:
-					new_path.extend(key.split(str_sep))
-				else:
-					new_path.append(key)
-			self.path = new_path
-
 		# Clean up empty strings
 		self.path = [x for x in self.path if x != ""]
 
 
 	def __repr__(self) -> str:
-		return f"Path(path={self.path}, str_sep={self.str_sep}, raw={self.raw})"
+		return f"Path(path={self.path}, raw={self.raw})"
 
 
 	@property
@@ -58,11 +45,10 @@ class Path:
 		return self.path[key]
 
 
-	def copy(self, replace_path=None, replace_str_sep=None, replace_raw=None) -> Path:
+	def copy(self, replace_path=None, replace_raw=None) -> Path:
 		path_copy = list(self.path) if replace_path is None else replace_path
-		str_sep_copy = str(self.str_sep) if replace_str_sep is None else replace_str_sep
 		raw_copy = self.raw if replace_raw is None else replace_raw
-		return Path(path_copy, str_sep=str_sep_copy, raw=raw_copy)
+		return Path(path_copy, raw=raw_copy)
 
 
 	def expand(self, ref: dict | list) -> list[Path]:
@@ -84,4 +70,4 @@ class Path:
 		# Return empty list if no paths were found
 		if paths == [[]]:
 			return []
-		return [Path(p, str_sep=self.str_sep, raw=self.raw) for p in paths]
+		return [Path(p, raw=self.raw) for p in paths]

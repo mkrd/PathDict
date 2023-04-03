@@ -29,18 +29,16 @@ def test_at():
 	db = dummy_data.get_db()
 	assert pd(db).at().path_handle.path == []
 	assert pd(db).at("").path_handle.path == []
-	assert pd(db).at("/").path_handle.path == []
 	assert pd(db).at([]).path_handle.path == []
 	assert pd(db).at("users").path_handle.path == ["users"]
 	assert pd(db).at(["users"]).path_handle.path == ["users"]
 	assert pd(db).at("users", "1").path_handle.path == ["users", "1"]
-	assert pd(db).at("users/1", "friends").path_handle.path == ["users", "1", "friends"]
-	assert pd(db, str_sep="-").at("users-1", "friends").path_handle.path == ["users", "1", "friends"]
-	assert pd(db).at(["users/1", "friends"]).path_handle.path == ["users", "1", "friends"]
+	assert pd(db).at("users", "1", "friends").path_handle.path == ["users", "1", "friends"]
+	assert pd(db).at(["users", "1", "friends"]).path_handle.path == ["users", "1", "friends"]
 
 
 def test_at_parent():
-	assert pd(dummy_data.get_db()).at("users/1").at_parent().path_handle.path == ["users"]
+	assert pd(dummy_data.get_db()).at("users", "1").at_parent().path_handle.path == ["users"]
 	pd(dummy_data.get_db()).at_parent().get() is None
 
 
@@ -54,10 +52,10 @@ def test_simple_get():
 	assert pd(db).get() == db
 	assert pd(db).at("").get() == db
 	assert pd(db).at().get() == db
-	assert pd(db).at("users/1/name").get() == "John"
-	assert pd(db).at("users/9/name").get() is None
+	assert pd(db).at("users", "1", "name").get() == "John"
+	assert pd(db).at("users", "9", "name").get() is None
 	assert pd(db).at(2).get() is None
-	assert pd(db).at("users/9/name").get("default") == "default"
+	assert pd(db).at("users", "9", "name").get("default") == "default"
 
 
 def test_referencing():
@@ -85,7 +83,7 @@ def test_referencing():
 
 def test__repr__():
 	j = {"1": 2}
-	assert str(pd(j)) == "PathDict(self.data = {'1': 2}, self.path_handle = Path(path=[], str_sep=/, raw=False))"
+	assert str(pd(j)) == "PathDict(self.data = {'1': 2}, self.path_handle = Path(path=[], raw=False))"
 
 
 def test_reset_at_after_in():
@@ -149,7 +147,7 @@ def test_contains():
 	users_pd = pd(users_dict)
 	assert "total_users" in users_pd
 	assert ["premium_users", 1] in users_pd
-	assert "premium_users/1" in users_pd
+	assert "premium_users", "1" in users_pd
 	assert "premium_users", "1" in users_pd
 	assert ["premium_users", "44"] not in users_pd
 	assert ["users", "1"] in users_pd
@@ -233,7 +231,7 @@ def test_set_path():
 
 	# Cover specific KeyError
 	with pytest.raises(KeyError):
-		p.at("u3/meta/age").set(22)
+		p.at("u3", "meta", "age").set(22)
 
 	with pytest.raises(TypeError):
 		p.at().set("Not Allowed")
@@ -249,13 +247,13 @@ def test_set_path():
 
 def test_map():
 	j = {"1": {"2": 3}}
-	assert pd(j).at("1/2").map(lambda x: x + 1).get() == 4
-	assert pd(j).at("1/6/7").map(lambda x: (x or 0) + 1).get() == 1
-	assert pd(j).at("1/6/7").map(lambda x: (x or 0) + 1).get() == 2
+	assert pd(j).at("1", "2").map(lambda x: x + 1).get() == 4
+	assert pd(j).at("1", "6", "7").map(lambda x: (x or 0) + 1).get() == 1
+	assert pd(j).at("1", "6", "7").map(lambda x: (x or 0) + 1).get() == 2
 	assert j["1"]["2"] == 4
 	assert j["1"]["6"]["7"] == 2
 	with pytest.raises(TypeError):
-		pd(j).at("1/99/99").map(lambda x: x + 1)
+		pd(j).at("1", "99", "99").map(lambda x: x + 1)
 
 
 def test_mapped():
@@ -264,8 +262,8 @@ def test_mapped():
 		"a": {"b": "c"}
 	}
 
-	p = pd(j).at("1/2").mapped(lambda x: x + 1).at().get()
-	p2 = pd(j).deepcopy().at("1/2").map(lambda x: x + 1).at().get()
+	p = pd(j).at("1", "2").mapped(lambda x: x + 1).at().get()
+	p2 = pd(j).deepcopy().at("1", "2").map(lambda x: x + 1).at().get()
 
 
 	assert j["1"]["2"] == 3
@@ -278,7 +276,7 @@ def test_mapped():
 
 def test_append():
 	p = pd({})
-	p.at("1/2").append(3)
+	p.at("1", "2").append(3)
 	assert p.at().get() == {"1": {"2": [3]}}
 	with pytest.raises(TypeError):
 		p.at("1").append(2)
@@ -357,7 +355,7 @@ def test_reduce():
 		p.at("l1").reduce(lambda v, a: a + v, aggregate=0)
 
 	p = pd(dummy_data.get_users())
-	assert p.at("users/*/name").reduce(lambda v, a: a + [v], aggregate=[]) == ["Joe", "Ben", "Sue"]
+	assert p.at("users", "*", "name").reduce(lambda v, a: a + [v], aggregate=[]) == ["Joe", "Ben", "Sue"]
 
 
 def test_keys():
@@ -365,7 +363,7 @@ def test_keys():
 	assert p.keys() == ["1"]
 	assert p.at("1").keys() == ["2"]
 	with pytest.raises(AttributeError):
-		p.at("1/2").keys()
+		p.at("1", "2").keys()
 
 
 def test_values():
@@ -373,7 +371,7 @@ def test_values():
 	assert p.values() == [{"2": [3]}]
 	assert p.at("1").values() == [[3]]
 	with pytest.raises(AttributeError):
-		p.at("1/2").values()
+		p.at("1", "2").values()
 
 
 def test_items():
@@ -381,14 +379,14 @@ def test_items():
 	assert list(p.items()) == [("1", {"2": [3]})]
 	assert list(p.at("1").items()) == [("2", [3])]
 	with pytest.raises(AttributeError):
-		p.at("1/2").items()
+		p.at("1", "2").items()
 
 
 def test__len__():
 	p = pd({"1": {"2": [3, 1]}})
 	assert len(p) == 1
 	assert len(p.at("1")) == 1
-	assert len(p.at("1/2")) == 2
+	assert len(p.at("1", "2")) == 2
 
 
 def test_pop():

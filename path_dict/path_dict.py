@@ -11,7 +11,7 @@ class PathDict:
 	path_handle: Path
 
 
-	def __init__(self, data: dict | list, str_sep="/", raw=False, path: Path = None):
+	def __init__(self, data: dict | list, raw=False, path: Path = None):
 		"""
 		A PathDict always refers to a dict or list.
 		It is used to get data or perform operations at a given path.
@@ -23,7 +23,7 @@ class PathDict:
 				f"({data})"
 			)
 		self.data = data
-		self.path_handle = Path([], str_sep=str_sep, raw=raw) if path is None else path
+		self.path_handle = Path([], raw=raw) if path is None else path
 
 
 	@classmethod
@@ -78,7 +78,7 @@ class PathDict:
 	############################################################################
 
 
-	def at(self, *path, str_sep=None, raw=None) -> PathDict | MultiPathDict:
+	def at(self, *path, raw=None) -> PathDict | MultiPathDict:
 		"""
 		Calling at(path) moves the handle to the given path, and returns the
 		handle.
@@ -86,7 +86,6 @@ class PathDict:
 		A path can be a string, a list or a tuple. For example, the following
 		are equivalent:
 		>>> d = {"a": {"b": {"c": 1}}}
-		>>>	pd(d).at("a/b/c").get() # -> 1
 		>>> pd(d).at(["a", "b", "c"]).get() # -> 1
 		>>> pd(d).at("a", "b", "c").get() # -> 1
 
@@ -96,14 +95,12 @@ class PathDict:
 		operations on all the selected elements at once.
 
 		:param path: The path to move to.
-		:param str_sep: The separator to use if there are separators in the path.
 		:param raw: If True, the path is not parsed, and is used as is. For
 		example, "*" will not be interpreted as a wildcard, but as a usual key.
 		"""
 
-		str_sep = self.path_handle.str_sep if str_sep is None else str_sep
 		raw = self.path_handle.raw if raw is None else raw
-		self.path_handle = Path(*path, str_sep=str_sep, raw=raw)
+		self.path_handle = Path(*path, raw=raw)
 
 		if self.path_handle.has_wildcards:
 			return MultiPathDict(self.data, self.path_handle)
@@ -120,7 +117,7 @@ class PathDict:
 
 		Example:
 		>>> d = {"a": {"b": {"c": 1}}}
-		>>> pd(d).at("a/b").filter(lambda k,v: v > 1).root().filter(lambda k,v: k == "a").get()
+		>>> pd(d).at("a", "b").filter(lambda k,v: v > 1).root().filter(lambda k,v: k == "a").get()
 		"""
 		return self.at()
 
@@ -155,13 +152,13 @@ class PathDict:
 
 		Example:
 		>>> d = {"a": {"b": {"c": [1]}}}
-		>>> pd(d).at("a/b/c").get()    # -> [1] (Valid path)
-		>>> pd(d).at("a/b/d").get()    # -> None (Valid path, but does not exist)
-		>>> pd(d).at("a/b/c/d").get()  # -> KeyError (Invalid path - cannot get key "d" on a list)
-		>>> pd(d).at("a/b/c/0").get()  # -> 1 (Valid path)
+		>>> pd(d).at("a", "b", "c").get()    # -> [1] (Valid path)
+		>>> pd(d).at("a", "b", "d").get()    # -> None (Valid path, but does not exist)
+		>>> pd(d).at("a", "b", "c", "d").get()  # -> KeyError (Invalid path - cannot get key "d" on a list)
+		>>> pd(d).at("a", "b", "c", "0").get()  # -> 1 (Valid path)
 
 		Shorthand syntax:
-		>>> pd(d).at("a/b/c")[:]
+		>>> pd(d).at("a", "b", "c")[:]
 		You can use [:] to get the value at the current path.
 		Beware: using the subscript [...] will move the handle back to the root
 		of the data.

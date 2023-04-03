@@ -294,13 +294,12 @@ If you try to serialize a PathDict object itself, the operation will fail.
 # Reference
 
 
-### pd(data: dict | list, str_sep="/", raw=False) -> PathDict
+### pd(data: dict | list, raw=False) -> PathDict
 
 Creates and returns a handle on the given data.
 
  Args:
 - `data` - Must be a list or dict.
-- `str_sep` - Look within path strings for this separator and use it to split the path.
 - `raw` - If `True`, do not interpret paths. So wildcards (`*`) are interpreted as a usual key, and tuples will be interpreted as keys  as well.
 
 Returns:

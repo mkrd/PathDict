@@ -115,21 +115,21 @@ def test_scenario_3():
 		},
 	})
 
-	assert u.at("*/expenses/*/amount").sum() == 1403
-	assert u.at("2/expenses/*/amount").sum() == 53
-	assert u.at("*/expenses/1/amount").sum() == 603
+	assert u.at("*", "expenses", "*", "amount").sum() == 1403
+	assert u.at("2", "expenses", "*", "amount").sum() == 53
+	assert u.at("*", "expenses", "1", "amount").sum() == 603
 	# Get sum of all expenses in EUR
 
 
-	assert u.deepcopy(from_root=True).at("*/expenses/*").filter(lambda v: v["currency"] == "EUR").at("*/amount").sum() == 303
+	assert u.deepcopy(from_root=True).at("*", "expenses", "*").filter(lambda v: v["currency"] == "EUR").at("*", "amount").sum() == 303
 
 
 	# Get all transactions in CHF except for those of sue
 	assert u.at("*").filter(
 		lambda x: x["name"] != "Sue"
-	).at("*/expenses/*").filter(
+	).at("*", "expenses", "*").filter(
 		lambda v: v["currency"] == "CHF"
-	).at("*/amount").sum() == 50
+	).at("*", "amount").sum() == 50
 
 
 	j = pd({

@@ -31,7 +31,7 @@ users["*", "interests"] = lambda i: i + ["cooking"]
 print(users)
 
 # Remove all interests of Ben which do not start with "a" ("cooking is removed")
-users.at("u2/interests").filter(lambda i: not i.startswith("a"))
+users.at("u2", "interests").filter(lambda i: not i.startswith("a"))
 print(users)
 
 # Remove users that are younger than 30
@@ -115,11 +115,5 @@ posts = {
 
 
 last_week = datetime.now() - timedelta(weeks=1)
-pd(posts).at("*/ts").map(lambda ts: datetime.fromtimestamp(ts))
+pd(posts).at("*", "ts").map(lambda ts: datetime.fromtimestamp(ts))
 pd(posts).filter(lambda id, post: post["ts"] > last_week)
-
-
-# print(posts)
-
-# pd(tasks).at(task_id, "annotation/entry_list").append(new_entry)
-# tasks[task_id, "annotation/entry_list"] = lambda el: (el or []) + new_entry

@@ -20,9 +20,9 @@ def test_get_all():
 
 	p = pd(db)
 
-	assert p.at("nonexistent/*").gather() == []
-	assert p.at("*/nonexistent/*").gather() == []
-	# assert p.at("*/nonexistent").gather() == []
+	assert p.at("nonexistent", "*").gather() == []
+	assert p.at("*", "nonexistent", "*").gather() == []
+	# assert p.at("*", "nonexistent").gather() == []
 
 	# Finds all values, returns as list
 	assert p.at("*").gather() == [
@@ -88,10 +88,10 @@ def test_get_all_2():
 	ages = p.at(["*", "age"]).gather()
 	assert ages == [22, 49, 36]
 
-	ages_sum = sum(p.at("*/age").gather())
+	ages_sum = sum(p.at("*", "age").gather())
 	assert ages_sum == 107
 
-	# ages_over_30 = p.at("*/age").filtered(lambda x: x > 30)
+	# ages_over_30 = p.at("*", "age").filtered(lambda x: x > 30)
 	# print(ages_over_30)
 	# assert ages_over_30 == [49, 36]
 
@@ -109,9 +109,9 @@ def test_get_all_3():
 		"1": [2, 3, 4],
 		"2": "3",
 	})
-	assert p.at("1/*").gather() == [2, 3, 4]
+	assert p.at("1", "*").gather() == [2, 3, 4]
 	with pytest.raises(KeyError):
-		p.at("2/*").gather()
+		p.at("2", "*").gather()
 
 
 
@@ -145,7 +145,7 @@ def test_gather():
 
 	# Increment age of all users by 1
 	winners = winners_original.deepcopy(from_root=True)
-	winners.at("*/podium/*/age").map(lambda x: x + 1)
+	winners.at("*", "podium", "*", "age").map(lambda x: x + 1)
 	assert winners["2017", "podium", "17-place-1", "age"] == 23
 	assert winners["2017", "podium", "17-place-2", "age"] == 14
 	assert winners["2017", "podium", "17-place-3", "age"] == 99
@@ -163,14 +163,14 @@ def test_sum():
 		"1": {"a": 1, "b": [1]},
 		"2": {"a": 3, "b": [1]},
 	})
-	assert p.at("*/a").sum() == 4
+	assert p.at("*", "a").sum() == 4
 	with pytest.raises(TypeError):
-		p.at("*/b").sum()
+		p.at("*", "b").sum()
 
 
 def test__repr__():
 	p = pd({})
-	assert str(p.at("*")) == "MultiPathDict(self.root_data = {}, self.path_handle = Path(path=['*'], str_sep=/, raw=False))"
+	assert str(p.at("*")) == "MultiPathDict(self.root_data = {}, self.path_handle = Path(path=['*'], raw=False))"
 
 
 def test_set():
@@ -197,8 +197,8 @@ def test_set():
 		},
 	}
 	p = pd(db).deepcopy()
-	p.at("users/*/friends").set([])
-	p["users/*/blip"] = "blap"
+	p.at("users", "*", "friends").set([])
+	p["users", "*", "blip"] = "blap"
 	assert p["users", "1", "friends"] == []
 	assert p["users", "2", "friends"] == []
 	assert p["users", "3", "friends"] == []
