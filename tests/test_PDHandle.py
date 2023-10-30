@@ -82,7 +82,7 @@ def test_referencing():
 
 def test__repr__():
 	j = {"1": 2}
-	assert str(pd(j)) == "PathDict(self.data = {'1': 2}, self.path_handle = Path(path=[], raw=False))"
+	assert str(pd(j)) == 'PathDict({\n    "1": 2\n}, self.path_handle = Path(path=[], raw=False))'
 
 
 def test_reset_at_after_in():
