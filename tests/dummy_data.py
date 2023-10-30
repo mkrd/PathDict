@@ -1,4 +1,3 @@
-
 def get_users():
 	return {
 		"total_users": 3,
@@ -10,7 +9,7 @@ def get_users():
 			},
 			"2": {
 				"name": "Ben",
-				"age": 49
+				"age": 49,
 			},
 			"3": {
 				"name": "Sue",
@@ -21,7 +20,7 @@ def get_users():
 			["Ben", "Sue"],
 			["Joe", "Ben"],
 			["Ben", "Joe"],
-		]
+		],
 	}
 
 

@@ -1,15 +1,17 @@
 from __future__ import annotations
-from typing import Any, Callable
+
 import copy
+import json
+from typing import Any, Callable, Union
+
 from . import utils
-from . path import Path
+from .path import Path
 
 
 class PathDict:
 	root_data: dict | list | Any
-	data:      dict | list | Any
+	data: dict | list | Any
 	path_handle: Path
-
 
 	def __init__(self, data: dict | list, raw=False, path: Path = None):
 		"""
@@ -18,13 +20,9 @@ class PathDict:
 		When initialized, the current path is the root path.
 		"""
 		if not isinstance(data, (dict, list)):
-			raise TypeError(
-				f"PathDict init: data must be dict or list but is {type(data)} "
-				f"({data})"
-			)
+			raise TypeError(f"PathDict init: data must be dict or list but is {type(data)} " f"({data})")
 		self.data = data
 		self.path_handle = Path([], raw=raw) if path is None else path
-
 
 	@classmethod
 	def from_data_and_path(cls, data: dict | list, path: Path) -> PathDict:
@@ -36,10 +34,8 @@ class PathDict:
 		"""
 		return cls(data=data, path=path)
 
-
 	def __repr__(self) -> str:
-		return f"PathDict({self.data = }, {self.path_handle = })"
-
+		return f"PathDict({json.dumps(self.data, indent=4, sort_keys=True)}, {self.path_handle = })"
 
 	def deepcopy(self, from_root=False, true_deepcopy=False) -> PathDict:
 		"""
@@ -57,7 +53,6 @@ class PathDict:
 		data_copy = copy.deepcopy(data) if true_deepcopy else utils.fast_deepcopy(data)
 		return PathDict.from_data_and_path(data_copy, path)
 
-
 	def copy(self, from_root=False) -> PathDict:
 		"""
 		Return a shallow copy of the data at the current path or from the root.
@@ -72,13 +67,11 @@ class PathDict:
 		data_copy = copy.copy(self.data if from_root else self.get())
 		return PathDict.from_data_and_path(data_copy, path)
 
-
 	############################################################################
 	# Moving the handle
 	############################################################################
 
-
-	def at(self, *path, raw=None) -> PathDict | MultiPathDict:
+	def at(self, *path, raw=None) -> Union[PathDict, MultiPathDict]:
 		"""
 		Calling at(path) moves the handle to the given path, and returns the
 		handle.
@@ -106,7 +99,6 @@ class PathDict:
 			return MultiPathDict(self.data, self.path_handle)
 		return self
 
-
 	def at_root(self) -> PathDict:
 		"""
 		Move the handle back to the root of the data and return it.
@@ -121,13 +113,11 @@ class PathDict:
 		"""
 		return self.at()
 
-
 	def at_parent(self) -> PathDict:
 		"""
 		Move the handle to the parent of the current path and return it.
 		"""
 		return self.at(self.path_handle.path[:-1])
-
 
 	def at_children(self) -> MultiPathDict:
 		"""
@@ -136,12 +126,10 @@ class PathDict:
 		"""
 		return self.at(self.path_handle.path + ["*"])
 
-
 	############################################################################
 	# Getters
 	# Getters ALWAYS return actual values, not handles.
 	############################################################################
-
 
 	def get(self, default=None) -> dict | list | Any:
 		"""
@@ -174,12 +162,10 @@ class PathDict:
 				return default
 		return current
 
-
 	############################################################################
 	# Setters
 	# Setters ALWAYS return a handle, not the value.
 	############################################################################
-
 
 	def set(self, value) -> PathDict:
 		# Setting nothing is a no-op
@@ -218,7 +204,6 @@ class PathDict:
 
 		return self
 
-
 	def map(self, f: Callable) -> PathDict:
 		"""
 		Map the result of f to the value at path previously set by ".at(path)".
@@ -228,7 +213,6 @@ class PathDict:
 		self.set(f(self.get()))
 		return self
 
-
 	def mapped(self, f: Callable) -> PathDict:
 		"""
 		Makes a fast deepcopy of your root data, moves the handle to the previously
@@ -237,12 +221,10 @@ class PathDict:
 		current_handle = self.path_handle
 		return self.deepcopy(from_root=True).at(current_handle.path).map(f)
 
-
 	############################################################################
 	# Filter
 	# Filter ALWAYS return a handle, not the value.
 	############################################################################
-
 
 	def filter(self, f: Callable) -> PathDict:
 		"""
@@ -256,8 +238,6 @@ class PathDict:
 			return self.set([x for x in get_at_current if f(x)])
 		raise TypeError("PathDict filter: must be applied to a dict or list")
 
-
-
 	def filtered(self, f: Callable) -> PathDict:
 		"""
 		Shortcut for:
@@ -265,11 +245,9 @@ class PathDict:
 		"""
 		return self.copy().filter(f)
 
-
 	############################################################################
 	# Reduce
 	############################################################################
-
 
 	def reduce(self, f: Callable, aggregate=None) -> Any:
 		"""
@@ -292,11 +270,9 @@ class PathDict:
 			return agg
 		raise TypeError("PathDict reduce: must be applied to a dict or list")
 
-
 	############################################################################
 	#### Useful Shorthands
 	############################################################################
-
 
 	def sum(self) -> Any:
 		"""
@@ -309,13 +285,11 @@ class PathDict:
 			return sum(get_at_current)
 		raise TypeError("PathDict sum: must be applied to a dict or list")
 
-
 	def append(self, value) -> PathDict:
 		"""
 		Append the value to the list at the given path.
 		"""
 		return self.map(lambda l: (l or []) + [value])
-
 
 	def update(self, value) -> PathDict:
 		"""
@@ -323,19 +297,15 @@ class PathDict:
 		"""
 		return self.map(lambda d: {**d, **value})
 
-
 	############################################################################
 	#### Standard dict methods
 	############################################################################
 
-
 	def keys(self):
 		return list(self.get().keys())
 
-
 	def values(self):
 		return list(self.get().values())
-
 
 	def items(self):
 		return self.get().items()
@@ -346,7 +316,6 @@ class PathDict:
 	def __len__(self):
 		return len(self.get())
 
-
 	def __getitem__(self, path):
 		at = self.at(*path) if isinstance(path, tuple) else self.at(path)
 		if isinstance(at, MultiPathDict):
@@ -355,12 +324,10 @@ class PathDict:
 		self.at_root()
 		return res
 
-
 	def __setitem__(self, path, value):
 		at = self.at(*path) if isinstance(path, tuple) else self.at(path)
 		at.map(value) if callable(value) else at.set(value)
 		self.at_root()
-
 
 	def __contains__(self, *path):
 		try:
@@ -369,7 +336,6 @@ class PathDict:
 			return contains
 		except KeyError:
 			return False
-
 
 	def __iter__(self):
 		return iter(self.keys())

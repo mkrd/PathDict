@@ -1,4 +1,4 @@
-from . path_dict import PathDict
+from .path_dict import PathDict
 
 pd = PathDict
 

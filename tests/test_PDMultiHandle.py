@@ -1,7 +1,7 @@
-from path_dict import pd
 import pytest
-from tests import dummy_data
 
+from path_dict import pd
+from tests import dummy_data
 
 
 def test_get_all():
@@ -63,27 +63,26 @@ def test_get_all():
 		p.at("*", "*").gather(as_type="invalid")
 
 
-
-
-
 def test_get_all_2():
-	p = pd({
-		"1": {
-			"name": "Joe",
-			"age": 22,
-			"interests": ["Python", "C++", "C#"],
-		},
-		"2": {
-			"name": "Ben",
-			"age": 49,
-			"interests": ["Javascript", "C++", "Haskell"],
-		},
-		"3": {
-			"name": "Sue",
-			"age": 36,
-			"interests": ["Python", "C++", "C#"],
-		},
-	})
+	p = pd(
+		{
+			"1": {
+				"name": "Joe",
+				"age": 22,
+				"interests": ["Python", "C++", "C#"],
+			},
+			"2": {
+				"name": "Ben",
+				"age": 49,
+				"interests": ["Javascript", "C++", "Haskell"],
+			},
+			"3": {
+				"name": "Sue",
+				"age": 36,
+				"interests": ["Python", "C++", "C#"],
+			},
+		}
+	)
 
 	ages = p.at(["*", "age"]).gather()
 	assert ages == [22, 49, 36]
@@ -103,45 +102,43 @@ def test_get_all_2():
 	# ]
 
 
-
 def test_get_all_3():
-	p = pd({
-		"1": [2, 3, 4],
-		"2": "3",
-	})
+	p = pd(
+		{
+			"1": [2, 3, 4],
+			"2": "3",
+		}
+	)
 	assert p.at("1", "*").gather() == [2, 3, 4]
 	with pytest.raises(KeyError):
 		p.at("2", "*").gather()
 
 
-
-
-
 def test_gather():
-	winners_original = pd({
-		"2017": {
-			"podium": {
-				"17-place-1": {"name": "Joe", "age": 22},
-				"17-place-2": {"name": "Ben", "age": 13},
-				"17-place-3": {"name": "Sue", "age": 98},
+	winners_original = pd(
+		{
+			"2017": {
+				"podium": {
+					"17-place-1": {"name": "Joe", "age": 22},
+					"17-place-2": {"name": "Ben", "age": 13},
+					"17-place-3": {"name": "Sue", "age": 98},
+				},
+				"prices_list": ["Car", "Bike", "Plane"],
 			},
-			"prices_list": ["Car", "Bike", "Plane"],
-		},
-		"2018": {
-			"podium": {
-				"18-place-1": {"name": "Bernd", "age": 50},
-				"18-place-2": {"name": "Sara", "age": 32},
-				"18-place-3": {"name": "Jan", "age": 26},
+			"2018": {
+				"podium": {
+					"18-place-1": {"name": "Bernd", "age": 50},
+					"18-place-2": {"name": "Sara", "age": 32},
+					"18-place-3": {"name": "Jan", "age": 26},
+				},
+				"prices_list": ["Beer", "Coffee", "Cigarette"],
 			},
-			"prices_list": ["Beer", "Coffee", "Cigarette"],
-		},
-	})
+		}
+	)
 
 	# Get names of all winners
 	winners = winners_original.deepcopy(from_root=True)
-	assert winners.at("*", "podium", "*", "name").gather() == [
-		"Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"
-	]
+	assert winners.at("*", "podium", "*", "name").gather() == ["Joe", "Ben", "Sue", "Bernd", "Sara", "Jan"]
 
 	# Increment age of all users by 1
 	winners = winners_original.deepcopy(from_root=True)
@@ -157,12 +154,13 @@ def test_gather():
 	assert names_2017 == ["Joe", "Ben", "Sue"]
 
 
-
 def test_sum():
-	p = pd({
-		"1": {"a": 1, "b": [1]},
-		"2": {"a": 3, "b": [1]},
-	})
+	p = pd(
+		{
+			"1": {"a": 1, "b": [1]},
+			"2": {"a": 3, "b": [1]},
+		}
+	)
 	assert p.at("*", "a").sum() == 4
 	with pytest.raises(TypeError):
 		p.at("*", "b").sum()

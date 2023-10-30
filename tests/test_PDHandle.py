@@ -1,11 +1,10 @@
-from path_dict import pd
 import pytest
+
+from path_dict import pd
 from tests import dummy_data
 
 
-
 def test_initialization():
-
 	# Empty
 	assert pd({}).get() == {}
 
@@ -98,12 +97,12 @@ def test_deepcopy():
 	assert pd(j).at("1").get() is j["1"]
 
 	# deepcopy at root
-	assert pd(j).deepcopy().get()     == j
+	assert pd(j).deepcopy().get() == j
 	assert pd(j).deepcopy().get() is not j
 
 	# deepcopy at path
 	assert pd(j).at("1").deepcopy().get() is not j["1"]
-	assert pd(j).at("1").deepcopy().get()     == j["1"]
+	assert pd(j).at("1").deepcopy().get() == j["1"]
 	assert pd(j).deepcopy().at("1").get() is not j["1"]
 
 	# deepcopy from root at path
@@ -123,11 +122,11 @@ def test_copy():
 	j = {"1": {"2": 3}}
 	assert pd(j).at("1").get() is j["1"]
 
-	assert pd(j).copy().get()     == j
+	assert pd(j).copy().get() == j
 	assert pd(j).copy().get() is not j
 
 	assert pd(j).at("1").copy().get() is not j["1"]
-	assert pd(j).at("1").copy().get()     == j["1"]
+	assert pd(j).at("1").copy().get() == j["1"]
 	assert pd(j).copy().at("1").get() is j["1"]
 
 	assert pd(j).at("1").copy(from_root=True).at().get() == j
@@ -140,9 +139,7 @@ def test_copy():
 	assert dc_pd is not dc_pd_copy
 
 
-
 def test_contains():
-
 	users_dict = dummy_data.get_users()
 	users_pd = pd(users_dict)
 	assert "total_users" in users_pd
@@ -158,12 +155,14 @@ def test_contains():
 	assert ["users", "1", "name", "joe", "Doe"] not in users_pd  # too many paths
 
 
-
 def test_nested_object_copy():
 	# Test copy with object
-	class TestObject():
-		def __init__(self, data): self.data = data
-		def __repr__(self): return f"TestObject({self.data})"
+	class TestObject:
+		def __init__(self, data):
+			self.data = data
+
+		def __repr__(self):
+			return f"TestObject({self.data})"
 
 	o = pd({})
 	o["test", "test"] = TestObject({"1": "2"})
@@ -190,9 +189,6 @@ def test_nested_object_copy():
 	assert fdc.at("test", "test").get() is o.at("test", "test").get()
 
 
-
-
-
 def test_get_path():
 	users_dict = dummy_data.get_users()
 	users_pd = pd(users_dict)
@@ -215,8 +211,6 @@ def test_get_path():
 	assert users_pd["users", "1", "*"] == ["Joe", 22]
 
 
-
-
 def test_set_path():
 	assert pd(["1", 2]).set([3, "4"]).get() == [3, "4"]
 
@@ -235,8 +229,6 @@ def test_set_path():
 
 	with pytest.raises(TypeError):
 		p.at().set("Not Allowed")
-
-
 
 	p = pd({"l1": [1, 2, 3]})
 	with pytest.raises(KeyError):
@@ -257,14 +249,10 @@ def test_map():
 
 
 def test_mapped():
-	j = {
-		"1": {"2": 3},
-		"a": {"b": "c"}
-	}
+	j = {"1": {"2": 3}, "a": {"b": "c"}}
 
 	p = pd(j).at("1", "2").mapped(lambda x: x + 1).at().get()
 	p2 = pd(j).deepcopy().at("1", "2").map(lambda x: x + 1).at().get()
-
 
 	assert j["1"]["2"] == 3
 	assert p["1"]["2"] == 4
@@ -295,7 +283,7 @@ def test_filter_behavior_spec():
 			"2": "20",
 			"3": "30",
 			"4": "40",
-		}
+		},
 	}
 	p = pd(j)
 	p.at("1").filter(lambda k, v: int(k) > 3)
@@ -308,29 +296,14 @@ def test_filter_behavior_spec():
 		p.at("a").filter(lambda x: x)
 
 
-
 def test_filter():
 	users_pd = pd(dummy_data.get_users())
 
 	users_below_30 = users_pd.deepcopy().at("users").filtered(lambda k, v: v["age"] <= 30)
-	assert users_below_30.get() == {
-		"1": {
-			"age": 22,
-			"name": "Joe"
-		}
-	}
+	assert users_below_30.get() == {"1": {"age": 22, "name": "Joe"}}
 
 	premium_users = users_pd.deepcopy().at("users").filtered(lambda k, v: int(k) in users_pd["premium_users"])
-	assert premium_users.get() == {
-		"1": {
-			"age": 22,
-			"name": "Joe"
-		},
-		"3": {
-			"age": 32,
-			"name": "Sue"
-		}
-	}
+	assert premium_users.get() == {"1": {"age": 22, "name": "Joe"}, "3": {"age": 32, "name": "Sue"}}
 
 	follows_includes_joe = users_pd.at("follows").filtered(lambda e: "Joe" in e)
 	assert isinstance(follows_includes_joe.get(), list)
@@ -338,7 +311,6 @@ def test_filter():
 		["Joe", "Ben"],
 		["Ben", "Joe"],
 	]
-
 
 
 def test_reduce():
@@ -398,7 +370,6 @@ def test_pop():
 
 
 def test_iter():
-
 	p = pd({"a": 1, "b": 2, "c": 3})
 
 	keys = []

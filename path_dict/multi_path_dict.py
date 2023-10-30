@@ -1,28 +1,26 @@
 from __future__ import annotations
+
 from typing import Any, Callable
-from . path import Path
-from . path_dict import PathDict
+
+from .path import Path
+from .path_dict import PathDict
 
 
 class MultiPathDict:
 	path_handle: Path
 	root_data: dict | list
 
-
 	def __init__(self, data: dict | list, path: Path):
 		self.path_handle = path
 		self.root_data = data
 
-
 	def __repr__(self) -> str:
 		return f"MultiPathDict({self.root_data = }, {self.path_handle = })"
-
 
 	############################################################################
 	# Setters
 	# Setters ALWAYS return a value
 	############################################################################
-
 
 	def gather(self, as_type="list", include_paths=False) -> dict | list:
 		"""
@@ -49,7 +47,6 @@ class MultiPathDict:
 				res[tuple(path.path)] = handle.at(path.path).get()
 		return res
 
-
 	def gather_pd(self, as_type="list", include_paths=False) -> PathDict:
 		data = self.gather(as_type=as_type, include_paths=include_paths)
 		return PathDict.from_data_and_path(data, self.path_handle.copy(replace_path=[]))
@@ -58,7 +55,6 @@ class MultiPathDict:
 	# Setters
 	# Setters ALWAYS return a handle, not the value.
 	############################################################################
-
 
 	def map(self, f: Callable) -> PathDict:
 		"""
@@ -70,18 +66,15 @@ class MultiPathDict:
 			PathDict.from_data_and_path(self.root_data, path).map(f)
 		return PathDict.from_data_and_path(self.root_data, self.path_handle)
 
-
 	def reduce(self, f: Callable, aggregate: Any, as_type="list", include_paths=False) -> Any:
 		"""
 		Get all values of the given multi-path, and reduce them using f.
 		"""
 		return self.gather_pd(as_type=as_type, include_paths=include_paths).reduce(f, aggregate)
 
-
 	############################################################################
 	#### Filter
 	############################################################################
-
 
 	def filter(self, f: Callable, as_type="list", include_paths=False) -> PathDict:
 		"""
@@ -90,15 +83,12 @@ class MultiPathDict:
 		"""
 		return self.gather_pd(as_type=as_type, include_paths=include_paths).filter(f)
 
-
 	# def filtered(self, f: Callable[[Any], bool], as_type="list", include_paths=False) -> PathDict:
 	# 	raise NotImplementedError
-
 
 	############################################################################
 	#### Useful shorthands
 	############################################################################
-
 
 	def sum(self) -> Any:
 		"""
@@ -106,12 +96,10 @@ class MultiPathDict:
 		"""
 		return sum(self.gather())
 
-
 	def set(self, value: Any) -> PathDict:
 		for path in self.path_handle.expand(self.root_data):
 			PathDict.from_data_and_path(self.root_data, path).set(value)
 		return self
-
 
 	############################################################################
 	#### Standard dict methods

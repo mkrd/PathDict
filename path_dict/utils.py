@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Any
 
 
@@ -44,8 +45,7 @@ def guarded_get(current: dict | list, key: Any):
 	if isinstance(current, list):
 		return safe_list_get(current, key)
 	raise KeyError(
-		f"PathDict: The path is not a stack of nested dicts and lists "
-		f"(value at key {key} has type {type(current)})"
+		f"PathDict: The path is not a stack of nested dicts and lists " f"(value at key {key} has type {type(current)})"
 	)
 
 
@@ -89,6 +89,5 @@ def get_nested_keys_or_indices(ref: dict | list, path: list):
 	if isinstance(current, list):
 		return list(range(len(current)))
 	raise KeyError(
-		f"PathDict: The path is not a stack of nested dicts and lists "
-		f"(value at key {key} has type {type(current)})"
+		f"PathDict: The path is not a stack of nested dicts and lists " f"(value at key {key} has type {type(current)})"
 	)
