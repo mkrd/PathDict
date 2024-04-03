@@ -9,7 +9,7 @@
 Why do I need this?
 ================================================================================
 
-Do you work with dicts a lot, but you also whish that they could do more?
+Do you work with dicts a lot, but you also wish that they could do more?
 Then PathDict is for you!
 
 Lets look at this dict:
